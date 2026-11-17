@@ -1,0 +1,25 @@
+# Build output
+build/
+dist/
+*.obj
+*.exp
+*.lib
+*.pdb
+*.ilk
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+out/
+
+# Editors / OS
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# Local audio you do not have the right to redistribute
+assets/private/
+*.local.wav
