@@ -10,8 +10,8 @@ Plugin de telemetria, somente de som, para o **Euro Truck Simulator 2** (e ATS).
 ranger de freio com lona vitrificada enquanto o pedal de freio está pressionado e uma
 saída de ar quando ele é solto.
 
-> **Status: em desenvolvimento inicial (0.x).** O plugin compila e carrega como plugin de
-> telemetria, mas ainda não foi validado dentro do jogo. Esperam-se mudanças antes da 1.0.0.
+> **Status: em desenvolvimento inicial (0.x).** O plugin foi validado dentro do jogo
+> (carrega e toca os sons). Esperam-se ajustes antes da 1.0.0.
 
 ### Recursos
 
@@ -92,7 +92,8 @@ seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Veja o
 
 ### Licença
 
-Código: [MIT](LICENSE). Sons: veja [CREDITS.md](CREDITS.md).
+Código: [MIT](LICENSE). Sons: veja [CREDITS.md](CREDITS.md) (o som de freio é de
+terceiros e **não** é coberto pela MIT).
 
 ---
 
@@ -102,8 +103,8 @@ A sound-only telemetry plugin for **Euro Truck Simulator 2** (and ATS) that play
 glazed-lining brake squeal while the brake pedal is pressed, and an air release when it
 is let go.
 
-> **Status: early development (0.x).** The plugin builds and loads as a telemetry plugin,
-> but it has not been validated in-game yet. Expect changes before 1.0.0.
+> **Status: early development (0.x).** The plugin has been validated in-game (it loads and
+> plays the sounds). Expect adjustments before 1.0.0.
 
 ### Features
 
@@ -182,4 +183,5 @@ follow [Semantic Versioning](https://semver.org/). See [CHANGELOG.md](CHANGELOG.
 
 ### License
 
-Code: [MIT](LICENSE). Sounds: see [CREDITS.md](CREDITS.md).
+Code: [MIT](LICENSE). Sounds: see [CREDITS.md](CREDITS.md) (the brake sound is third-party
+and is **not** covered by the MIT license).

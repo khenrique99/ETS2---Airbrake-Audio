@@ -2,11 +2,17 @@
 
 ## assets/sounds/brake_loop.wav
 
-Sintetizado para este projeto (lona vitrificada: chiado agudo, rangido e raspagem).
-Criado pelo autor do projeto; coberto pela licença do projeto ([MIT](LICENSE)).
+Áudio "carreta temperatura alta" do mod de terceiro **ETS Brake Fade 0.8.1.2**, incluído
+sem alterações. **Não é coberto pela licença MIT** deste projeto: os direitos pertencem ao
+autor original do mod. Foi incluído por decisão do mantenedor deste repositório, que assume
+a responsabilidade por essa redistribuição. Se você é o autor e quer a remoção ou uma
+atribuição diferente, abra uma issue e o arquivo será tratado de imediato.
 
-Synthesized for this project (glazed brake lining: high-pitched squeal, creak and grind).
-Created by the project author; covered by the project license ([MIT](LICENSE)).
+Audio "carreta temperatura alta" from the third-party mod **ETS Brake Fade 0.8.1.2**,
+included unmodified. It is **not covered by this project's MIT license**: the rights belong
+to the mod's original author. It was included at the repository maintainer's decision, who
+takes responsibility for this redistribution. If you are the author and want it removed or
+credited differently, open an issue and the file will be dealt with promptly.
 
 ## assets/sounds/air_release.wav
 
