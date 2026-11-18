@@ -7,6 +7,7 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include "web.h"   // before windows.h: pulls in winsock2.h first
 #include <windows.h>
 #include <cmath>
 #include <cstdarg>
@@ -21,6 +22,10 @@ namespace {
 
 Config    g_config;
 Engine    g_audio;
+// Heap-allocated on purpose: a static would join its threads while the DLL unloads,
+// which can deadlock under the loader lock if the game never calls shutdown.
+WebUi*    g_web = nullptr;
+Metrics   g_metrics;
 scs_log_t g_gameLog = nullptr;
 bool      g_comInitialized = false;
 bool      g_ready = false;
@@ -174,8 +179,30 @@ void updateAirRelease(double now) {
     }
 }
 
+// Applies settings changed from the settings page. Changing the boost re-bakes the
+// sounds, so it silences them first (the voices read those buffers).
+void applyPendingConfig() {
+    Config updated;
+    if (!g_web && g_web->takePending(updated)) return;
+    const bool boostChanged = updated.boostDb != g_config.boostDb;
+    g_config = updated;
+    if (boostChanged) {
+        stopAllSounds();
+        g_audio.setBoost(g_config.boostDb);
+    }
+}
+
+void publishMetrics(double now) {
+    g_metrics.pedal = g_pedal;
+    g_metrics.speedKmh = std::fabs(g_speedMs) * 3.6f;
+    g_metrics.heldS = g_braking ? float(now - g_pressedAt) : 0.0f;
+    g_metrics.state = g_airPlaying ? 2 : (g_brakeVoiceRunning && g_brakeVolume > 0.01f ? 1 : 0);
+}
+
 void onFrameEnd() {
-    if (!g_ready || g_paused) return;
+    if (!g_ready) return;
+    applyPendingConfig();
+    if (g_paused) return;
     const double now = nowSeconds();
     const float dt = float(std::min(0.1, std::max(0.0, now - g_lastTickAt)));
     g_lastTickAt = now;
@@ -183,6 +210,7 @@ void onFrameEnd() {
     updateTrigger(now);
     updateBrakeVolume(dt);
     updateAirRelease(now);
+    publishMetrics(now);
 }
 
 void onChannel(const scs_string_t, const scs_u32_t, const scs_value_t* value, const scs_context_t context) {
@@ -223,7 +251,8 @@ __declspec(dllexport) scs_result_t scs_telemetry_init(const scs_u32_t version,
     g_gameLog = params->common.log;
 
     const std::wstring directory = moduleDirectory();
-    g_config = loadConfig(directory + L"airbrake_audio.ini");
+    const std::wstring iniPath = directory + L"airbrake_audio.ini";
+    g_config = loadConfig(iniPath);
 
     // If the game already initialized COM in another mode this fails harmlessly.
     g_comInitialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_MULTITHREADED));
@@ -251,6 +280,9 @@ __declspec(dllexport) scs_result_t scs_telemetry_init(const scs_u32_t version,
         return SCS_RESULT_generic_error;
     }
 
+    g_web = new WebUi;
+    g_web->start(g_config, iniPath, &g_metrics);   // hotkey + settings page (no-op when web_ui=off)
+
     g_paused = false;   // only silence when the game says it paused
     g_lastTickAt = nowSeconds();
     g_ready = true;
@@ -260,6 +292,11 @@ __declspec(dllexport) scs_result_t scs_telemetry_init(const scs_u32_t version,
 }
 
 __declspec(dllexport) void scs_telemetry_shutdown(void) {
+    if (g_web) {
+        g_web->stop();
+        delete g_web;
+        g_web = nullptr;
+    }
     if (g_ready) {
         stopAllSounds();
         g_ready = false;

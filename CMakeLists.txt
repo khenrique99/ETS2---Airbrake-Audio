@@ -7,5 +7,5 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")   # static CRT: no vcruntime dep
 
 add_library(airbrake_audio SHARED src/plugin.cpp)
 target_compile_definitions(airbrake_audio PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
-target_link_libraries(airbrake_audio PRIVATE xaudio2 ole32)
+target_link_libraries(airbrake_audio PRIVATE xaudio2 ole32 ws2_32 shell32 user32)
 set_target_properties(airbrake_audio PROPERTIES PREFIX "")

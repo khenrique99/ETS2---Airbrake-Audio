@@ -22,7 +22,7 @@ if not exist dist\plugins\airbrake_audio mkdir dist\plugins\airbrake_audio
 
 cl /nologo /std:c++17 /O2 /EHsc /MT /LD /W3 /DNOMINMAX /DWIN32_LEAN_AND_MEAN ^
    src\plugin.cpp /Fo:build\ /Fe:dist\plugins\airbrake_audio.dll ^
-   /link /DLL xaudio2.lib ole32.lib
+   /link /DLL xaudio2.lib ole32.lib ws2_32.lib shell32.lib user32.lib
 if errorlevel 1 (
   echo [error] Build failed.
   exit /b 1

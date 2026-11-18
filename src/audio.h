@@ -119,6 +119,8 @@ public:
             error = "air release sound (" + toAscii(config.airFile) + "): " + error;
             return false;
         }
+        brakeRaw_ = brake_.samples;
+        airRaw_ = air_.samples;
         applyBoost(brake_, config.boostDb);
         applyBoost(air_, config.boostDb);
         loopStartFrame_ = std::min(brake_.frames - 1,
@@ -150,6 +152,15 @@ public:
     }
 
     float airSeconds() const { return air_.seconds(); }
+
+    // Re-bakes the gain from the original samples. Both voices must be stopped first
+    // (they read the sample buffers), so the caller stops the sounds before calling it.
+    void setBoost(float gainDb) {
+        brake_.samples = brakeRaw_;
+        air_.samples = airRaw_;
+        applyBoost(brake_, gainDb);
+        applyBoost(air_, gainDb);
+    }
 
     // Brake: continuous loop that restarts at loop_start_s.
     void brakeStart() {
@@ -207,5 +218,6 @@ private:
     IXAudio2SourceVoice* brakeVoice_ = nullptr;
     IXAudio2SourceVoice* airVoice_ = nullptr;
     Wav brake_, air_;
+    std::vector<int16_t> brakeRaw_, airRaw_;   // samples before the boost
     uint32_t loopStartFrame_ = 0;
 };
