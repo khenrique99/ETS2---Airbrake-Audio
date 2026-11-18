@@ -10,8 +10,8 @@ Plugin de telemetria, somente de som, para o **Euro Truck Simulator 2** (e ATS).
 ranger de freio com lona vitrificada enquanto o pedal de freio está pressionado e uma
 saída de ar quando ele é solto.
 
-> **Status: em desenvolvimento inicial (0.x).** O plugin foi validado dentro do jogo
-> (carrega e toca os sons). Esperam-se ajustes antes da 1.0.0.
+> **Status: estável (1.0.0).** O plugin foi validado dentro do jogo (carrega e toca os sons).
+> Siga o [Versionamento Semântico](https://semver.org/lang/pt-BR/) a partir daqui.
 
 ### Recursos
 
@@ -56,9 +56,22 @@ Abra o `game.log.txt` (`Documentos\Euro Truck Simulator 2`) e procure
 `[airbrake_audio] v... ready (...)`. Em caso de falha, o mesmo prefixo informa o problema:
 arquivo de som não encontrado, formato não suportado ou nenhum dispositivo de áudio.
 
+### Tela de configuração
+
+Dentro do jogo, aperte a tecla **-** (hífen) para abrir uma tela de configuração em uma janela do
+navegador, com métricas ao vivo (pedal, velocidade, tempo de freada, som tocando) e controles
+deslizantes para volume, ganho e tempos. As mudanças valem na hora; **Salvar no .ini** as mantém.
+Apertar a mesma tecla de novo fecha a tela.
+
+- A tecla pode ser trocada na própria tela (botão **Alterar tecla**) ou em `hotkey=` no `.ini`.
+- Para a janela aparecer por cima do jogo, use o jogo em **janela sem borda**. Em tela cheia exclusiva
+  o Windows pode escondê-la atrás do jogo.
+- O servidor só escuta em `127.0.0.1` (nenhum outro computador acessa), só sobe quando você aperta a
+  tecla e desliga sozinho após 3 minutos sem uso. `web_ui=off` no `.ini` desativa tudo isso.
+
 ### Configurar
 
-Edite `airbrake_audio.ini`; todas as opções têm comentários. Reinicie o jogo depois.
+Edite `airbrake_audio.ini` (ou use a tela acima); todas as opções têm comentários. Reinicie o jogo depois de editar o arquivo à mão.
 
 Para usar seus próprios sons, coloque arquivos WAV PCM 16-bit (mono ou estéreo) na pasta
 `plugins\airbrake_audio` e ajuste `file=` nas seções `[brake]` e `[air_release]`. Para um
@@ -78,7 +91,7 @@ A saída fica em `dist\plugins`. Também há um projeto CMake (`CMakeLists.txt`)
 ### Estrutura do projeto
 
 ```
-src/        código do plugin (plugin.cpp, audio.h, config.h, scs_sdk_min.h, version.h)
+src/        código do plugin (plugin.cpp, audio.h, config.h, web.h, webpage.h, scs_sdk_min.h, version.h)
 config/     airbrake_audio.ini padrão
 assets/     sons padrão
 build.bat   script de compilação e empacotamento (MSVC)
@@ -103,8 +116,8 @@ A sound-only telemetry plugin for **Euro Truck Simulator 2** (and ATS) that play
 glazed-lining brake squeal while the brake pedal is pressed, and an air release when it
 is let go.
 
-> **Status: early development (0.x).** The plugin has been validated in-game (it loads and
-> plays the sounds). Expect adjustments before 1.0.0.
+> **Status: stable (1.0.0).** The plugin has been validated in-game (it loads and plays the
+> sounds). [Semantic Versioning](https://semver.org/) applies from here on.
 
 ### Features
 
@@ -148,9 +161,21 @@ Open `game.log.txt` (`Documents\Euro Truck Simulator 2`) and look for
 `[airbrake_audio] v... ready (...)`. On failure the same prefix reports what is wrong:
 sound file not found, unsupported format, or no audio output device.
 
+### Settings page
+
+Inside the game, press the **-** (minus) key to open a settings page in a browser window, with live
+metrics (pedal, speed, brake time, playing sound) and sliders for volume, gain and timings. Changes
+apply immediately; **Save to .ini** keeps them. Pressing the same key again closes the page.
+
+- The key can be changed on the page itself (**Change key** button) or with `hotkey=` in the `.ini`.
+- For the window to appear over the game, run the game in **borderless windowed** mode. In exclusive
+  fullscreen Windows may hide it behind the game.
+- The server only listens on `127.0.0.1` (no other computer can reach it), starts only when you press
+  the key, and shuts itself down after 3 minutes without use. `web_ui=off` in the `.ini` disables all of it.
+
 ### Configure
 
-Edit `airbrake_audio.ini`; every option is commented. Restart the game afterwards.
+Edit `airbrake_audio.ini` (or use the page above); every option is commented. Restart the game after editing the file by hand.
 
 To use your own sounds, put 16-bit PCM WAV files (mono or stereo) in the
 `plugins\airbrake_audio` folder and set `file=` in the `[brake]` and `[air_release]`
@@ -170,7 +195,7 @@ The output is `dist\plugins`. A CMake project is also provided (`CMakeLists.txt`
 ### Project layout
 
 ```
-src/        plugin source (plugin.cpp, audio.h, config.h, scs_sdk_min.h, version.h)
+src/        plugin source (plugin.cpp, audio.h, config.h, web.h, webpage.h, scs_sdk_min.h, version.h)
 config/     default airbrake_audio.ini
 assets/     default sounds
 build.bat   MSVC build + packaging script
