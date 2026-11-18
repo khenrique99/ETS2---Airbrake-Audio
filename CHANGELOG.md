@@ -10,6 +10,25 @@ mudar sem aviso.
 The format follows [Keep a Changelog](https://keepachangelog.com/) and the project uses
 [Semantic Versioning](https://semver.org/). Versions before 1.0.0 may change without notice.
 
+## [1.0.0] - 2026-11-18
+
+**Português:** primeira versão estável. Tela de configuração em HTML, aberta por uma tecla dentro do jogo (padrão: `-`).
+
+**English:** first stable release. HTML settings page, opened with a key inside the game (default: `-`).
+
+### Adicionado / Added
+
+- Tela de configuração com métricas ao vivo e controles deslizantes (ganho, volumes, tempos), com
+  botões para salvar no `.ini` e restaurar o padrão; português e inglês.
+  / Settings page with live metrics and sliders (gain, volumes, timings), with buttons to save to the
+  `.ini` and restore defaults; Portuguese and English.
+- Tecla de atalho configurável (padrão `-`), na tela ou em `hotkey=`. Seção `[ui]` no `.ini`.
+  / Configurable hotkey (default `-`), on the page or via `hotkey=`. New `[ui]` section in the `.ini`.
+- Servidor local só em `127.0.0.1`, sob demanda e com desligamento por inatividade.
+  / Local server on `127.0.0.1` only, on demand, shutting down when idle.
+- O ganho (`boost_db`) agora pode ser mudado com o jogo rodando.
+  / The gain (`boost_db`) can now be changed while the game is running.
+
 ## [0.1.0] - 2026-11-18
 
 **Português:** plugin validado dentro do jogo. O som de freio padrão passou a ser o áudio do
@@ -51,5 +70,6 @@ validated in-game.
 - Sons padrão, script de build MSVC, projeto CMake e documentação em português/inglês.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
+[1.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v1.0.0
 [0.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.1.0
 [0.0.1]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.0.1

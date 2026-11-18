@@ -1,4 +1,4 @@
 #pragma once
 
 // Keep in sync with the git tag (vMAJOR.MINOR.PATCH) and CHANGELOG.md.
-#define AIRBRAKE_AUDIO_VERSION "0.1.0"
+#define AIRBRAKE_AUDIO_VERSION "1.0.0"
