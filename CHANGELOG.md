@@ -10,6 +10,21 @@ mudar sem aviso.
 The format follows [Keep a Changelog](https://keepachangelog.com/) and the project uses
 [Semantic Versioning](https://semver.org/). Versions before 1.0.0 may change without notice.
 
+## [0.1.0] - 2026-11-18
+
+**Português:** plugin validado dentro do jogo. O som de freio padrão passou a ser o áudio do
+mod de terceiro ETS Brake Fade (veja [CREDITS.md](CREDITS.md); não coberto pela MIT).
+
+**English:** plugin validated in-game. The default brake sound is now the audio from the
+third-party ETS Brake Fade mod (see [CREDITS.md](CREDITS.md); not covered by MIT).
+
+### Alterado / Changed
+
+- Som de freio padrão (`brake_loop.wav`) trocado pelo áudio do mod de terceiro.
+  / Default brake sound (`brake_loop.wav`) replaced with the third-party mod's audio.
+- Documentação atualizada: plugin validado no jogo e aviso de licença do som.
+  / Documentation updated: plugin validated in-game and sound licensing notice.
+
 ## [0.0.1] - 2026-11-17
 
 **Português:** primeira versão de pré-lançamento. Compila e carrega como plugin de
@@ -36,4 +51,5 @@ validated in-game.
 - Sons padrão, script de build MSVC, projeto CMake e documentação em português/inglês.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
+[0.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.1.0
 [0.0.1]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.0.1
