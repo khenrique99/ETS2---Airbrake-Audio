@@ -1,25 +1,29 @@
-# Build output
+# Build
 build/
 dist/
-*.obj
-*.exp
-*.lib
-*.pdb
-*.ilk
-
-# CMake
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
 out/
+cmake-build-*/
+*.dll
+*.pdb
+*.lib
+*.exp
+*.ilk
+*.obj
 
-# Editors / OS
+# IDEs / SO
 .vs/
 .vscode/
 .idea/
+*.user
+*.suo
+CMakeSettings.json
+CMakeUserPresets.json
 Thumbs.db
 desktop.ini
 
-# Local audio you do not have the right to redistribute
+# Arquivos locais do Claude (nunca versionar)
+.claude/settings.local.json
+
+# Audio sem direito de redistribuicao
 assets/private/
 *.local.wav
