@@ -41,6 +41,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and the proje
   / `[ui]` in the `.ini`: `web_ui`/`port` are gone; now `app=on|off` and `hotkey=CTRL+PLUS`. Old `.ini` files are still read (`web_ui`, `hotkey=Minus`), without the server.
 - O plugin segue carregando sem placa de som ou com arquivo faltando: o motivo aparece na tela e no `game.log.txt`.
   / The plugin keeps loading without an audio device or with a missing file: the reason shows in the window and in `game.log.txt`.
+- Licença: de MIT para **PolyForm Noncommercial 1.0.0** (copyright de Kelvin Henrique Ferreira): uso pessoal e não comercial liberado, venda e uso comercial não. As versões anteriores já distribuídas sob MIT continuam MIT.
+  / License: from MIT to **PolyForm Noncommercial 1.0.0** (copyright Kelvin Henrique Ferreira): personal and non-commercial use is free, selling and commercial use are not. Earlier versions already distributed under MIT stay MIT.
 - Mensagens de log usam o prefixo `[AirbrakeAudio]`.
   / Log messages use the `[AirbrakeAudio]` prefix.
 - Código dividido em componentes (`brake_sounds`, `audio_engine`, `wav`, `config`, `app_bridge`...), compilado com `/W4 /WX`.

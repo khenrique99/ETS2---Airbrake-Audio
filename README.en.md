@@ -87,5 +87,5 @@ Commits follow [Conventional Commits](https://www.conventionalcommits.org/) and 
 
 ## License
 
-Code: [MIT](LICENSE). Sounds: see [CREDITS.md](CREDITS.md) (the brake sound is third-party and **not** covered by MIT).
+Code: © 2026 Kelvin Henrique Ferreira, under the [PolyForm Noncommercial 1.0.0](LICENSE): personal and non-commercial use is free; **selling it or using it commercially is not allowed** without the author's permission. Sounds: see [CREDITS.md](CREDITS.md) (the brake sound is third-party and **not** covered by this license).
 Fan project, not affiliated with SCS Software. Euro Truck Simulator 2 is a trademark of SCS Software.
