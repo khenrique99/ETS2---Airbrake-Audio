@@ -1,212 +1,112 @@
-# Airbrake Audio
+# ETS2 Airbrake Audio
 
-[Português (Brasil)](#português-brasil) | [English](#english)
+**🇧🇷 Português** · [🇺🇸 English](README.en.md)
 
----
+Plugin de **som** para **Euro Truck Simulator 2** (e ATS) + uma tela (**AirbrakeAudio.exe**) para ajustar tudo
+dentro do jogo. Toca um ranger de freio com lona vitrificada enquanto o pedal está apertado e uma saída de ar
+quando ele é solto.
 
-## Português (Brasil)
+| | |
+|---|---|
+| **Versão** | 2.0.0 |
+| **Jogo** | ETS2 **1.62.x** (Steam, 64 bits); só lê pedal e velocidade pelo Telemetry SDK |
+| **Sistema** | Windows 10/11 64 bits |
+| **Modo** | single-player e multiplayer (só toca áudio local, não altera nada do jogo) |
 
-Plugin de telemetria, somente de som, para o **Euro Truck Simulator 2** (e ATS). Toca um
-ranger de freio com lona vitrificada enquanto o pedal de freio está pressionado e uma
-saída de ar quando ele é solto.
+## Download e instalação
 
-> **Status: estável (1.0.0).** O plugin foi validado dentro do jogo (carrega e toca os sons).
-> Siga o [Versionamento Semântico](https://semver.org/lang/pt-BR/) a partir daqui.
+1. Baixe **`AirbrakeAudio-...-plugins.zip`** na página de
+   [Releases](https://github.com/khenrique99/ETS2---Airbrake-Audio/releases). O nome da versão indica o jogo
+   (`v2.0.0+ets2.1.62` = plugin 2.0.0 feito para o ETS2 1.62.x).
+2. Extraia o conteúdo **dentro da pasta `plugins`** do jogo:
+   `...\steamapps\common\Euro Truck Simulator 2\bin\win_x64\plugins\` (crie a pasta se não existir).
+   Devem ficar lá:
 
-### Recursos
+   ```
+   plugins\airbrake_audio.dll
+   plugins\airbrake_audio.ini
+   plugins\AirbrakeAudio.exe
+   plugins\airbrake_audio\brake_loop.wav
+   plugins\airbrake_audio\air_release.wav
+   ```
 
-- **Freio pressionado:** som de freio em loop; o volume acompanha o pedal, com fade de
-  entrada e saída.
-- **Freio solto:** saída de ar. Uma freada longa toca o som inteiro, em volume cheio; uma
-  curta toca mais baixo e é cortada cedo.
-- **Controle de volume próprio:** ganho com limitador suave (`boost_db`), independente do
-  controle de volume do jogo.
-- **Tudo configurável** em um único arquivo `.ini` comentado.
+3. Abra o jogo e aceite o aviso de **"SDK features"**.
+4. Confira no `game.log.txt` (`Documentos\Euro Truck Simulator 2`) a linha `[AirbrakeAudio] v... pronto`.
+   Se der problema, a mesma linha diz o motivo (arquivo de som não encontrado, formato não suportado, sem dispositivo de áudio).
 
-### Não mexe na mecânica do jogo
+## Como usar
 
-O plugin apenas **lê** o pedal de freio e a velocidade pelo Telemetry SDK oficial da SCS e
-toca áudio. Ele não altera temperatura do freio, força de frenagem nem física, e não lê nem
-modifica a memória do jogo. Convive com outros plugins de aquecimento de freio.
+- **Ctrl + =** dentro do jogo abre a tela por cima. **Esc** ou o mesmo atalho voltam ao jogo.
+- A tela mostra ao vivo o pedal, a velocidade, o tempo de freada e o som que está tocando.
+- Os **Ajustes** (abas Freio, Saída de ar, Geral) valem na hora; **Salvar** grava no `airbrake_audio.ini`
+  sem apagar os comentários. **Restaurar padrão** volta tudo ao original (e só grava se você salvar).
+- **Configurações** (rodapé): troque o atalho que abre a tela — clique em **Alterar…**, aperte a combinação e **Salvar**.
+- **PT/EN** troca o idioma da tela. **Demonstração** simula freadas sem o jogo aberto.
+- Use o jogo em **janela sem borda** para a tela aparecer por cima; em tela cheia exclusiva o Windows pode escondê-la.
+- O atalho padrão (**Ctrl + =**) convive com o do [Trailer Control](https://github.com/khenrique99/ETS2---Trailer-Control) (**Ctrl + -**).
 
-Se outro plugin também toca sons de freio, os dois tocam ao mesmo tempo. Desative o som na
+Para usar seus próprios sons, coloque arquivos WAV PCM 16 bits (mono ou estéreo) em `plugins\airbrake_audio` e
+ajuste `file=` em `[brake]` e `[air_release]`. Para um loop de freio, defina `loop_start_s` (vale ao reiniciar o jogo).
+
+## Não mexe na mecânica do jogo
+
+O plugin só **lê** o pedal de freio e a velocidade pelo Telemetry SDK oficial da SCS e toca áudio. Não altera
+temperatura do freio, força de frenagem nem física, e não lê nem modifica a memória do jogo. Convive com plugins de
+aquecimento de freio. Se outro plugin também toca sons de freio, os dois tocam ao mesmo tempo: desative o som na
 configuração do outro plugin em vez de apagar os arquivos dele.
 
-### Instalação
+## Para desenvolvedores
 
-1. Baixe `airbrake-audio-<versão>-win64.zip` na página de
-   [Releases](../../releases).
-2. Copie o **conteúdo** da pasta `plugins` para
-   `...\Euro Truck Simulator 2\bin\win_x64\plugins` (crie a pasta se necessário):
+### Compilar
 
-   ```
-   plugins\airbrake_audio.dll
-   plugins\airbrake_audio.ini
-   plugins\airbrake_audio\brake_loop.wav
-   plugins\airbrake_audio\air_release.wav
-   ```
+Requisitos: Visual Studio 2022 ou Build Tools (C++ desktop); o CMake vem junto. **Não precisa baixar o SCS SDK**
+(`src/scs_sdk_min.h` declara só o que é usado).
 
-3. Abra o jogo e aceite o aviso único sobre recursos avançados do SDK.
-
-Requer o jogo em 64 bits, no Windows 10 ou superior.
-
-### Conferir
-
-Abra o `game.log.txt` (`Documentos\Euro Truck Simulator 2`) e procure
-`[airbrake_audio] v... ready (...)`. Em caso de falha, o mesmo prefixo informa o problema:
-arquivo de som não encontrado, formato não suportado ou nenhum dispositivo de áudio.
-
-### Tela de configuração
-
-Dentro do jogo, aperte a tecla **-** (hífen) para abrir uma tela de configuração em uma janela do
-navegador, com métricas ao vivo (pedal, velocidade, tempo de freada, som tocando) e controles
-deslizantes para volume, ganho e tempos. As mudanças valem na hora; **Salvar no .ini** as mantém.
-Apertar a mesma tecla de novo fecha a tela.
-
-- A tecla pode ser trocada na própria tela (botão **Alterar tecla**) ou em `hotkey=` no `.ini`.
-- Para a janela aparecer por cima do jogo, use o jogo em **janela sem borda**. Em tela cheia exclusiva
-  o Windows pode escondê-la atrás do jogo.
-- O servidor só escuta em `127.0.0.1` (nenhum outro computador acessa), só sobe quando você aperta a
-  tecla e desliga sozinho após 3 minutos sem uso. `web_ui=off` no `.ini` desativa tudo isso.
-
-### Configurar
-
-Edite `airbrake_audio.ini` (ou use a tela acima); todas as opções têm comentários. Reinicie o jogo depois de editar o arquivo à mão.
-
-Para usar seus próprios sons, coloque arquivos WAV PCM 16-bit (mono ou estéreo) na pasta
-`plugins\airbrake_audio` e ajuste `file=` nas seções `[brake]` e `[air_release]`. Para um
-loop de freio, defina `loop_start_s` com o segundo em que o loop deve recomeçar.
-
-### Compilar a partir do código
-
-Requer o Visual Studio Build Tools com a carga "Desenvolvimento para desktop com C++".
-
-```bat
-winget install Microsoft.VisualStudio.2022.BuildTools
-build.bat
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build.ps1
 ```
 
-A saída fica em `dist\plugins`. Também há um projeto CMake (`CMakeLists.txt`).
+Compila, roda os testes e gera em `dist\` o zip da release. O nome leva a versão do plugin (`src/version.h`) e a do
+jogo (`-GameTag ETS2-1.62`, padrão). `-SkipTests` pula os testes.
 
-### Estrutura do projeto
+### Testes (sem o jogo)
 
-```
-src/        código do plugin (plugin.cpp, audio.h, config.h, web.h, webpage.h, scs_sdk_min.h, version.h)
-config/     airbrake_audio.ini padrão
-assets/     sons padrão
-build.bat   script de compilação e empacotamento (MSVC)
-```
+- `aa_tests` — WAV, configuração, lógica do freio (com saída de áudio falsa), comandos, atalhos, JSON e modelo da tela.
+- `plugin_selftest` — o **jogo falso** (`tests/fake_game.cpp`) carrega a DLL de verdade pelo SDK, simula pedal e
+  manda comandos como a tela faria, conferindo o `status.json`.
 
-### Contribuindo
+Roteiro no jogo: [docs/TESTE-NO-JOGO.md](docs/TESTE-NO-JOGO.md).
 
-Os commits seguem [Conventional Commits](https://www.conventionalcommits.org/) e as versões
-seguem o [Versionamento Semântico](https://semver.org/lang/pt-BR/). Veja o
-[CHANGELOG.md](CHANGELOG.md).
+### Comunicação plugin ↔ tela
 
-### Licença
+Arquivos em `Documentos\ETS2AirbrakeAudio\`: `status.json` (plugin → tela) e `command.txt` (tela → plugin).
+Protocolo em [src/shared/ipc.h](src/shared/ipc.h).
 
-Código: [MIT](LICENSE). Sons: veja [CREDITS.md](CREDITS.md) (o som de freio é de
-terceiros e **não** é coberto pela MIT).
-
----
-
-## English
-
-A sound-only telemetry plugin for **Euro Truck Simulator 2** (and ATS) that plays a
-glazed-lining brake squeal while the brake pedal is pressed, and an air release when it
-is let go.
-
-> **Status: stable (1.0.0).** The plugin has been validated in-game (it loads and plays the
-> sounds). [Semantic Versioning](https://semver.org/) applies from here on.
-
-### Features
-
-- **Brake pressed:** a looping brake sound; the volume follows the pedal and fades in/out.
-- **Brake released:** an air release. A long application plays the whole sound at full
-  volume; a short one plays quieter and is cut early.
-- **Own volume control:** a gain stage with a soft limiter (`boost_db`), independent of the
-  game's volume slider.
-- **Everything configurable** in one commented `.ini` file.
-
-### It does not touch game mechanics
-
-The plugin only **reads** the brake pedal and the speed through the official SCS Telemetry
-SDK and plays audio. It does not change brake temperature, braking force or physics, and it
-does not read or patch game memory. It coexists with other brake-heating plugins.
-
-If another plugin also plays brake sounds, both will play at once. Turn the sound off in
-that plugin's own configuration instead of deleting its files.
-
-### Install
-
-1. Download `airbrake-audio-<version>-win64.zip` from the
-   [Releases](../../releases) page.
-2. Copy the **contents** of the `plugins` folder to
-   `...\Euro Truck Simulator 2\bin\win_x64\plugins` (create it if needed):
-
-   ```
-   plugins\airbrake_audio.dll
-   plugins\airbrake_audio.ini
-   plugins\airbrake_audio\brake_loop.wav
-   plugins\airbrake_audio\air_release.wav
-   ```
-
-3. Start the game and accept the one-time prompt about advanced SDK features.
-
-Requires a 64-bit game on Windows 10 or later.
-
-### Verify
-
-Open `game.log.txt` (`Documents\Euro Truck Simulator 2`) and look for
-`[airbrake_audio] v... ready (...)`. On failure the same prefix reports what is wrong:
-sound file not found, unsupported format, or no audio output device.
-
-### Settings page
-
-Inside the game, press the **-** (minus) key to open a settings page in a browser window, with live
-metrics (pedal, speed, brake time, playing sound) and sliders for volume, gain and timings. Changes
-apply immediately; **Save to .ini** keeps them. Pressing the same key again closes the page.
-
-- The key can be changed on the page itself (**Change key** button) or with `hotkey=` in the `.ini`.
-- For the window to appear over the game, run the game in **borderless windowed** mode. In exclusive
-  fullscreen Windows may hide it behind the game.
-- The server only listens on `127.0.0.1` (no other computer can reach it), starts only when you press
-  the key, and shuts itself down after 3 minutes without use. `web_ui=off` in the `.ini` disables all of it.
-
-### Configure
-
-Edit `airbrake_audio.ini` (or use the page above); every option is commented. Restart the game after editing the file by hand.
-
-To use your own sounds, put 16-bit PCM WAV files (mono or stereo) in the
-`plugins\airbrake_audio` folder and set `file=` in the `[brake]` and `[air_release]`
-sections. For a brake loop, set `loop_start_s` to the second where the loop should restart.
-
-### Build from source
-
-Requires the Visual Studio Build Tools with the "Desktop development with C++" workload.
-
-```bat
-winget install Microsoft.VisualStudio.2022.BuildTools
-build.bat
-```
-
-The output is `dist\plugins`. A CMake project is also provided (`CMakeLists.txt`).
-
-### Project layout
+### Estrutura
 
 ```
-src/        plugin source (plugin.cpp, audio.h, config.h, web.h, webpage.h, scs_sdk_min.h, version.h)
-config/     default airbrake_audio.ini
-assets/     default sounds
-build.bat   MSVC build + packaging script
+src/
+  plugin.cpp            entradas scs_telemetry_*; liga os componentes
+  brake_sounds.*        lógica do freio e da saída de ar (sem Windows: testável)
+  sound_output.h        interface de saída de som (ISoundOutput)
+  audio_engine.*        XAudio2: toca os WAV
+  wav.*                 leitura de WAV e ganho com limitador
+  config.*              airbrake_audio.ini (tabela única de ajustes)
+  app_bridge.*          thread: command.txt, status.json, atalho
+  settings_commands.*   o que cada comando da tela faz
+  command_inbox.* status_writer.* hotkeys.* app_launcher.* log.*
+  shared/               protocolo plugin <-> tela, edição de .ini, atalhos
+app/                    AirbrakeAudio.exe (Win32 + GDI+, sem dependências): main, ui, model, texts, settings
+tests/                  testes + jogo falso
+assets/sounds/          sons padrão
 ```
 
-### Contributing
+## Contribuindo
 
-Commits follow [Conventional Commits](https://www.conventionalcommits.org/) and versions
-follow [Semantic Versioning](https://semver.org/). See [CHANGELOG.md](CHANGELOG.md).
+Commits seguem [Conventional Commits](https://www.conventionalcommits.org/) e as versões seguem o
+[Versionamento Semântico](https://semver.org/lang/pt-BR/); veja o [CHANGELOG.md](CHANGELOG.md).
 
-### License
+## Licença
 
-Code: [MIT](LICENSE). Sounds: see [CREDITS.md](CREDITS.md) (the brake sound is third-party
-and is **not** covered by the MIT license).
+Código: [MIT](LICENSE). Sons: veja [CREDITS.md](CREDITS.md) (o som de freio é de terceiros e **não** é coberto pela MIT).
+Projeto de fã, sem vínculo com a SCS Software. Euro Truck Simulator 2 é marca da SCS Software.

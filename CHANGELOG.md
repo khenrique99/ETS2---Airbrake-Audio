@@ -10,6 +10,49 @@ mudar sem aviso.
 The format follows [Keep a Changelog](https://keepachangelog.com/) and the project uses
 [Semantic Versioning](https://semver.org/). Versions before 1.0.0 may change without notice.
 
+## [Unreleased]
+
+## [2.0.0] - 2026-11-25
+
+**Português:** a tela de configuração deixa de ser uma página no navegador e vira o **AirbrakeAudio.exe**, com a mesma identidade visual do Trailer Control. O código do plugin foi dividido em componentes e ganhou testes.
+
+**English:** the settings page is no longer a browser page: it is now **AirbrakeAudio.exe**, with the same look as Trailer Control. The plugin code was split into components and now has tests.
+
+### Adicionado / Added
+
+- App **AirbrakeAudio.exe** (Win32 + GDI+): métricas ao vivo, ajustes em abas (Freio, Saída de ar, Geral), salvar no `.ini` preservando comentários, restaurar padrão, português/inglês, sempre no topo e modo demonstração (`--demo`).
+  / **AirbrakeAudio.exe** app (Win32 + GDI+): live metrics, tabbed settings, save to the `.ini` keeping comments, restore defaults, Portuguese/English, always on top and demo mode (`--demo`).
+- Atalho **Ctrl + =** abre a tela no jogo (convive com o **Ctrl + -** do Trailer Control); trocável em Configurações.
+  / **Ctrl + =** opens the window in game (coexists with the **Ctrl + -** of Trailer Control); changeable under Settings.
+- Comunicação plugin ↔ tela por `status.json` e `command.txt` em `Documentos\ETS2AirbrakeAudio` (`src/shared/ipc.h`).
+  / Plugin ↔ window communication via `status.json` and `command.txt` in `Documents\ETS2AirbrakeAudio`.
+- Testes sem o jogo (`aa_tests`) e o "jogo falso" (`plugin_selftest`) que carrega a DLL real.
+  / Tests without the game (`aa_tests`) and the "fake game" (`plugin_selftest`) that loads the real DLL.
+- `scripts/build.ps1` (compila, testa, empacota), `scripts/publish-release.ps1` e `scripts/promote-to-main.ps1`.
+  / `scripts/build.ps1` (build, test, package), `scripts/publish-release.ps1` and `scripts/promote-to-main.ps1`.
+- Release com a versão do jogo no nome: tag `v2.0.0+ets2.1.62`, arquivo `AirbrakeAudio-v2.0.0-ETS2-1.62-plugins.zip`.
+  / Releases carry the game version: tag `v2.0.0+ets2.1.62`, file `AirbrakeAudio-v2.0.0-ETS2-1.62-plugins.zip`.
+- README em português e inglês separados e roteiros de teste no jogo (`docs/`).
+  / Separate Portuguese and English READMEs and in-game test scripts (`docs/`).
+
+### Alterado / Changed
+
+- `[ui]` do `.ini`: `web_ui`/`port` saíram; agora `app=on|off` e `hotkey=CTRL+PLUS`. O `.ini` antigo continua lido (`web_ui`, `hotkey=Minus`), mas sem o servidor.
+  / `[ui]` in the `.ini`: `web_ui`/`port` are gone; now `app=on|off` and `hotkey=CTRL+PLUS`. Old `.ini` files are still read (`web_ui`, `hotkey=Minus`), without the server.
+- O plugin segue carregando sem placa de som ou com arquivo faltando: o motivo aparece na tela e no `game.log.txt`.
+  / The plugin keeps loading without an audio device or with a missing file: the reason shows in the window and in `game.log.txt`.
+- Mensagens de log usam o prefixo `[AirbrakeAudio]`.
+  / Log messages use the `[AirbrakeAudio]` prefix.
+- Código dividido em componentes (`brake_sounds`, `audio_engine`, `wav`, `config`, `app_bridge`...), compilado com `/W4 /WX`.
+  / Code split into components, built with `/W4 /WX`.
+
+### Removido / Removed
+
+- Servidor HTTP local e página HTML embutida na DLL (`web.h`, `webpage.h`) e a dependência de `ws2_32`.
+  / The local HTTP server and the HTML page embedded in the DLL, and the `ws2_32` dependency.
+- `build.bat` (substituído por `scripts/build.ps1`).
+  / `build.bat` (replaced by `scripts/build.ps1`).
+
 ## [1.0.0] - 2026-11-18
 
 **Português:** primeira versão estável. Tela de configuração em HTML, aberta por uma tecla dentro do jogo (padrão: `-`).
@@ -70,6 +113,7 @@ validated in-game.
 - Sons padrão, script de build MSVC, projeto CMake e documentação em português/inglês.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
+[2.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.0.0%2Bets2.1.62
 [1.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v1.0.0
 [0.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.1.0
 [0.0.1]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.0.1
