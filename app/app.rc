@@ -1,0 +1,30 @@
+// Recursos do app Airbrake Audio
+#include <winres.h>
+#include "../src/version.h"
+
+1 ICON "app.ico"
+1 RT_MANIFEST "app.manifest"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION AIRBRAKE_AUDIO_VERSION_MAJOR,AIRBRAKE_AUDIO_VERSION_MINOR,AIRBRAKE_AUDIO_VERSION_PATCH,0
+ PRODUCTVERSION AIRBRAKE_AUDIO_VERSION_MAJOR,AIRBRAKE_AUDIO_VERSION_MINOR,AIRBRAKE_AUDIO_VERSION_PATCH,0
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041604b0"
+        BEGIN
+            VALUE "FileDescription", "Airbrake Audio - ajustes do plugin de freio para ETS2"
+            VALUE "FileVersion", AIRBRAKE_AUDIO_VERSION
+            VALUE "ProductName", "ETS2 Airbrake Audio"
+            VALUE "ProductVersion", AIRBRAKE_AUDIO_VERSION
+            VALUE "OriginalFilename", "AirbrakeAudio.exe"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x416, 1200
+    END
+END
