@@ -6,7 +6,7 @@
   A tag segue  v<versao do plugin>+ets2.<versao do jogo>  (ex.: v2.0.0+ets2.1.62): a versao do plugin
   vem de src\version.h e a do jogo do parametro -Game. O zip tem de ter o mesmo -GameTag do build
   (ETS2-1.62 <-> ets2.1.62). A tag precisa existir na main (scripts\promote-to-main.ps1 -Version X.Y.Z cria
-  a tag simples vX.Y.Z; este script cria a tag com o jogo).
+  -Version X.Y.Z -Game 1.62 (e enviada com -Push); este script so cria a release em cima dela.
 
 .EXAMPLE
   ./scripts/publish-release.ps1 -Game 1.62 -NotesFile docs\release-notes.md

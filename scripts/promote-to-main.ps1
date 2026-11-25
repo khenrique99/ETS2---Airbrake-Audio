@@ -5,17 +5,19 @@
 .DESCRIPTION
   CLAUDE.md e a pasta .claude/ existem somente na dev. Este script faz o merge
   dev -> main, remove esses arquivos do resultado e cria o commit de merge.
-  Opcionalmente cria a tag da versao.
+  Com -Version cria a tag v<versao>+ets2.<jogo> (mesmo padrao do Trailer Control; sem tag simples vX.Y.Z).
 
 .EXAMPLE
-  ./scripts/promote-to-main.ps1 -Version 2.0.0
+  ./scripts/promote-to-main.ps1 -Version 2.0.0 -Game 1.62
 #>
 param(
     [string]$Version,
+    [string]$Game,
     [switch]$Push
 )
 
 $ErrorActionPreference = 'Stop'
+if ($Version -and -not $Game) { throw "Informe -Game (versao do jogo, ex.: 1.62) junto com -Version." }
 $ClaudePaths = @('CLAUDE.md', '.claude')
 
 function Invoke-Git {
@@ -39,14 +41,15 @@ foreach ($p in $ClaudePaths) {
     if (Test-Path $p) { Invoke-Git rm -r -q --cached --ignore-unmatch -- $p; Remove-Item -Recurse -Force $p }
 }
 
-$msg = if ($Version) { "chore(release): v$Version" } else { 'chore: merge dev into main' }
+$tagName = if ($Version) { "v$Version+ets2.$Game" }
+$msg = if ($Version) { "chore(release): $tagName" } else { 'chore: merge dev into main' }
 Invoke-Git commit -m $msg
 
-if ($Version) { Invoke-Git tag -a "v$Version" -m "v$Version" }
+if ($Version) { Invoke-Git tag -a $tagName -m $tagName }
 
 if ($Push) {
     Invoke-Git push origin main
-    if ($Version) { Invoke-Git push origin "v$Version" }
+    if ($Version) { Invoke-Git push origin $tagName }
 }
 
 Invoke-Git checkout dev

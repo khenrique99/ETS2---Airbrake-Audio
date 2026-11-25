@@ -114,6 +114,3 @@ validated in-game.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
 [2.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.0.0%2Bets2.1.62
-[1.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v1.0.0
-[0.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.1.0
-[0.0.1]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v0.0.1

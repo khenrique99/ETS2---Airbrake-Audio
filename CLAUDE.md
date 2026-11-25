@@ -23,12 +23,12 @@ Projeto irmão (mesmo padrão de arquitetura, tela e releases): `ETS2---Trailer-
 ### 1.2 Branches
 | Branch | Uso |
 |---|---|
-| `main` | Estável, só recebe promoções da `dev`. **Nunca** contém `CLAUDE.md` nem `.claude/`. Cada promoção vira tag `vX.Y.Z`. |
+| `main` | Estável, só recebe promoções da `dev`. **Nunca** contém `CLAUDE.md` nem `.claude/`. Cada promoção vira a tag `vX.Y.Z+ets2.A.B` (sem tag simples). |
 | `dev` | Integração. Onde ficam `CLAUDE.md` e `.claude/`. Todo trabalho parte daqui. |
 | `feature/<nome>` / `fix/<nome>` | Trabalho novo / correção, a partir da `dev`. |
 
 - Nunca commitar direto na `main`. Nunca `push --force` na `main` ou na `dev`.
-- Promover `dev → main` **somente** com `scripts/promote-to-main.ps1 -Version X.Y.Z` (tira os arquivos do Claude).
+- Promover `dev → main` **somente** com `scripts/promote-to-main.ps1 -Version X.Y.Z -Game A.B` (tira os arquivos do Claude).
 
 ### 1.3 Mensagens de commit — Conventional Commits
 `<tipo>(<escopo>): <resumo no imperativo, minúsculo, sem ponto>`
@@ -42,7 +42,7 @@ Escopos: `audio`, `brake`, `config`, `app`, `ipc`, `hotkeys`, `build`, `docs`.
 - **Tag da release = `v<versão do plugin>+ets2.<versão do jogo>`**, ex.: `v2.0.0+ets2.1.62`.
   Arquivo: `AirbrakeAudio-v<versão>-ETS2-<jogo>-plugins.zip` (`scripts/build.ps1 -GameTag ETS2-1.62`).
   Release nova para outra versão do jogo = nova tag com o mesmo plugin ou plugin novo.
-- Fluxo: PR na `dev` → `scripts/promote-to-main.ps1 -Version X.Y.Z -Push` → `scripts/build.ps1` na `main` →
+- Fluxo: PR na `dev` → `scripts/promote-to-main.ps1 -Version X.Y.Z -Game 1.62 -Push` → `scripts/build.ps1` na `main` →
   `scripts/publish-release.ps1 -Game 1.62 -NotesFile <notas bilíngues>`.
 - Notas da release em pt-BR e inglês (como no Trailer Control): compatibilidade, instalação, arquivos, novidades.
 - Só o zip da pasta `plugins` vai na release.
