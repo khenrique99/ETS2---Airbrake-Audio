@@ -3,13 +3,13 @@
 ## assets/sounds/brake_loop.wav
 
 Áudio "carreta temperatura alta" do mod de terceiro **ETS Brake Fade 0.8.1.2**, incluído
-sem alterações. **Não é coberto pela licença MIT** deste projeto: os direitos pertencem ao
+sem alterações. **Não é coberto pela licença** deste projeto (PolyForm Noncommercial): os direitos pertencem ao
 autor original do mod. Foi incluído por decisão do mantenedor deste repositório, que assume
 a responsabilidade por essa redistribuição. Se você é o autor e quer a remoção ou uma
 atribuição diferente, abra uma issue e o arquivo será tratado de imediato.
 
 Audio "carreta temperatura alta" from the third-party mod **ETS Brake Fade 0.8.1.2**,
-included unmodified. It is **not covered by this project's MIT license**: the rights belong
+included unmodified. It is **not covered by this project's license** (PolyForm Noncommercial): the rights belong
 to the mod's original author. It was included at the repository maintainer's decision, who
 takes responsibility for this redistribution. If you are the author and want it removed or
 credited differently, open an issue and the file will be dealt with promptly.

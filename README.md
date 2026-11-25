@@ -108,5 +108,5 @@ Commits seguem [Conventional Commits](https://www.conventionalcommits.org/) e as
 
 ## Licença
 
-Código: [MIT](LICENSE). Sons: veja [CREDITS.md](CREDITS.md) (o som de freio é de terceiros e **não** é coberto pela MIT).
+Código: © 2026 Kelvin Henrique Ferreira, sob a [PolyForm Noncommercial 1.0.0](LICENSE): uso pessoal e não comercial liberado; **vender ou usar comercialmente não é permitido** sem autorização do autor. Sons: veja [CREDITS.md](CREDITS.md) (o som de freio é de terceiros e **não** é coberto por esta licença).
 Projeto de fã, sem vínculo com a SCS Software. Euro Truck Simulator 2 é marca da SCS Software.

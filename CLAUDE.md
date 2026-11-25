@@ -51,6 +51,8 @@ Escopos: `audio`, `brake`, `config`, `app`, `ipc`, `hotkeys`, `build`, `docs`.
 - O plugin **só lê** telemetria e toca áudio. Nada de ler/escrever memória do jogo.
 - Nunca versionar binários do jogo nem áudio sem direito de redistribuição (`assets/private/` é ignorado).
   O som de freio é de terceiros: manter `CREDITS.md` correto.
+- Licença: **PolyForm Noncommercial 1.0.0**, copyright de Kelvin Henrique Ferreira (ninguém pode vender). Não voltar para MIT nem
+  trocar por licença que permita uso comercial sem o Kelvin pedir. Código de terceiros só se a licença for compatível.
 - O SCS SDK **não** é necessário: `src/scs_sdk_min.h` declara só o usado (layout x64 conferido com `static_assert`).
 
 ---

@@ -34,6 +34,7 @@ Roteiro de teste no jogo: [docs/TESTE-NO-JOGO.md](https://github.com/khenrique99
 - Tela em português e inglês, modo demonstração e opção "sempre no topo".
 - O plugin continua carregando sem placa de som; o motivo aparece na tela e no `game.log.txt`.
 - Código reorganizado em componentes, com testes automáticos sem o jogo.
+- **Licença:** agora [PolyForm Noncommercial 1.0.0](https://github.com/khenrique99/ETS2---Airbrake-Audio/blob/main/LICENSE): uso pessoal e não comercial liberado; **vender ou usar comercialmente não é permitido**.
 - `[ui]` do `.ini` mudou: `app=on|off` e `hotkey=CTRL+PLUS` (`web_ui` e `port` saíram).
 
 ---
@@ -74,4 +75,5 @@ In-game test script: [docs/TESTING-IN-GAME.md](https://github.com/khenrique99/ET
 - Window in Portuguese and English, demo mode and an "always on top" option.
 - The plugin still loads without an audio device; the reason shows in the window and in `game.log.txt`.
 - Code reorganized into components, with automated tests that run without the game.
+- **License:** now [PolyForm Noncommercial 1.0.0](https://github.com/khenrique99/ETS2---Airbrake-Audio/blob/main/LICENSE): personal and non-commercial use is free; **selling it or using it commercially is not allowed**.
 - `[ui]` in the `.ini` changed: `app=on|off` and `hotkey=CTRL+PLUS` (`web_ui` and `port` are gone).
