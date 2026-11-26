@@ -25,6 +25,7 @@ from inside the game. It plays a glazed-lining brake squeal while the pedal is p
    plugins\airbrake_audio.ini
    plugins\AirbrakeAudio.exe
    plugins\airbrake_audio\brake_loop.wav
+   plugins\airbrake_audio\brake_loop_low.wav
    plugins\airbrake_audio\air_release.wav
    ```
 
@@ -44,7 +45,13 @@ from inside the game. It plays a glazed-lining brake squeal while the pedal is p
 - The default shortcut (**Ctrl + =**) coexists with [Trailer Control](https://github.com/khenrique99/ETS2---Trailer-Control) (**Ctrl + -**).
 
 To use your own sounds, put 16-bit PCM WAV files (mono or stereo) in `plugins\airbrake_audio` and set `file=` in
-`[brake]` and `[air_release]`. For a brake loop, set `loop_start_s` (applies after restarting the game).
+`[brake]` (`file=` high temperature, `file_low=` low temperature) and `file=` in `[air_release]`. For the brake loops,
+set `loop_start_s` / `loop_start_low_s` (applies after restarting the game).
+
+The brake has two sounds: with the pedal up to **65%** the **low temperature** one plays; from there on, the
+**high temperature** one. The swap crossfades with the fades (no hard cut) and the threshold is adjustable in the Brake
+tab ("High-temperature sound from", `high_from` in the `.ini`). The **air release** only plays on release if the
+brake application spent at least **2 s** on the high temperature sound (`min_high_time_s` in `[air_release]`, 0 = always).
 
 ## It does not touch game mechanics
 

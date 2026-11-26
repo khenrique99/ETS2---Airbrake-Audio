@@ -292,6 +292,9 @@ void paintMetrics(Painter &p, const RectF &card) {
     if (s.sound == "freio") {
         sound = Txt::SoundBrake;
         color = P.red;
+    } else if (s.sound == "freio_alto") {
+        sound = Txt::SoundBrakeHigh;
+        color = P.red;
     } else if (s.sound == "ar") {
         sound = Txt::SoundAir;
         color = P.accent;

@@ -12,8 +12,11 @@ struct Config {
     float boostDb = 6.0f; // ganho aplicado ao carregar os sons (com limitador suave)
 
     // [brake]
-    std::wstring brakeFile = L"brake_loop.wav";
+    std::wstring brakeFile = L"brake_loop.wav";        // "temperatura alta": pedal a partir de brakeHighFrom
+    std::wstring brakeLowFile = L"brake_loop_low.wav"; // "temperatura baixa": pedal abaixo de brakeHighFrom
     float loopStartS = 2.0f;
+    float loopStartLowS = 2.0f;
+    float brakeHighFrom = 0.65f; // pedal (0..1) a partir do qual toca o loop alto
     float fadeInMs = 60.0f;
     float fadeOutMs = 200.0f;
     float volMin = 0.35f; // volume com o pedal leve
@@ -30,6 +33,7 @@ struct Config {
     float airCutFadeMs = 120.0f;
     float airMinHoldMs = 400.0f;
     float airCooldownMs = 1500.0f;
+    float airMinHighS = 2.0f;  // so toca se a freada ficou isso no loop alto (0 = sempre)
 
     // [trigger]
     float thresholdOn = 0.05f;

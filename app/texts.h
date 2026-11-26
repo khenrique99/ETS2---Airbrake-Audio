@@ -25,6 +25,7 @@ enum class Txt {
     Playing,
     SoundNone,
     SoundBrake,
+    SoundBrakeHigh,
     SoundAir,
     Settings,
     TabBrake,

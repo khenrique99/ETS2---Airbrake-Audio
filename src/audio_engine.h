@@ -25,9 +25,9 @@ public:
     bool init(const Config &config, const std::wstring &soundDir, std::string &error);
     void shutdown();
 
-    void brakeStart() override;
-    void brakeSetVolume(float volume) override;
-    void brakeStop() override;
+    void brakeStart(BrakeLevel level) override;
+    void brakeSetVolume(BrakeLevel level, float volume) override;
+    void brakeStop(BrakeLevel level) override;
     void airPlay(float volume) override;
     void airSetVolume(float volume) override;
     void airStop() override;
@@ -35,13 +35,23 @@ public:
     void setBoost(float gainDb) override;
 
 private:
+    // Um loop de freio por nivel (indice = BrakeLevel), cada um com voz propria.
+    struct BrakeLoop {
+        IXAudio2SourceVoice *voice = nullptr;
+        Wav wav;
+        std::vector<int16_t> raw; // amostras antes do ganho
+        uint32_t loopStartFrame = 0;
+    };
+
+    bool loadBrakeLoop(BrakeLevel level, const std::wstring &path, float loopStartS, float boostDb, std::string &error);
+    BrakeLoop &loop(BrakeLevel level) { return brake_[static_cast<int>(level)]; }
+
     IXAudio2 *xaudio_ = nullptr;
     IXAudio2MasteringVoice *master_ = nullptr;
-    IXAudio2SourceVoice *brakeVoice_ = nullptr;
     IXAudio2SourceVoice *airVoice_ = nullptr;
-    Wav brake_, air_;
-    std::vector<int16_t> brakeRaw_, airRaw_; // amostras antes do ganho
-    uint32_t loopStartFrame_ = 0;
+    BrakeLoop brake_[kBrakeLevels];
+    Wav air_;
+    std::vector<int16_t> airRaw_; // amostras antes do ganho
 };
 
 } // namespace aa
