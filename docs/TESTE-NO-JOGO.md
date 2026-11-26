@@ -5,7 +5,7 @@ Marque o resultado de cada item e cole no PR. Jogo: ETS2 1.62.x, Steam, 64 bits.
 ## Preparação
 
 1. Extraia o zip em `...\Euro Truck Simulator 2\bin\win_x64\plugins\`. Devem ficar lá:
-   `airbrake_audio.dll`, `airbrake_audio.ini`, `AirbrakeAudio.exe` e a pasta `airbrake_audio\` com os dois `.wav`.
+   `airbrake_audio.dll`, `airbrake_audio.ini`, `AirbrakeAudio.exe` e a pasta `airbrake_audio\` com os três `.wav`.
 2. Abra o jogo com `-nointro -developer` e aceite o aviso de **"SDK features"**.
 3. Abra `Documentos\Euro Truck Simulator 2\game.log.txt` e procure `[AirbrakeAudio] v... pronto`.
    Se aparecer `Sem som: ...`, o motivo vem na mesma linha (arquivo faltando, formato, sem dispositivo).
@@ -27,6 +27,14 @@ Marque o resultado de cada item e cole no PR. Jogo: ETS2 1.62.x, Steam, 64 bits.
 | 11 | **Configurações** → Alterar → outra combinação → Salvar | Novo atalho vale na hora | |
 | 12 | Jogo em tela cheia exclusiva | Anotar se a tela aparece ou fica atrás do jogo | |
 | 13 | Convive com o Trailer Control (**Ctrl + -**) | Cada atalho abre só a sua tela | |
+| 14 | Frear com o pedal até ~50% | Som de **temperatura baixa**; tela mostra "freio · temp. baixa" | |
+| 15 | Aprofundar o pedal para além de 65% | Troca para o som de **temperatura alta** sem corte seco; tela mostra "freio · temp. alta" | |
+| 16 | Voltar o pedal para ~50% sem soltar | Volta ao som de temperatura baixa, cruzando suave | |
+| 17 | Pisar direto no fundo | Começa já no som de temperatura alta | |
+| 18 | Na tela, mudar "Som de temperatura alta a partir de" | O ponto da troca muda na hora | |
+| 19 | Frear uns 6 s só abaixo de 65% e soltar | **Sem** saída de ar | |
+| 20 | Frear acima de 65% por ~1 s e soltar | **Sem** saída de ar | |
+| 21 | Frear acima de 65% por mais de 2 s e soltar | Saída de ar toca | |
 
 ## Sem o jogo
 

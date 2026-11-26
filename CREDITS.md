@@ -1,18 +1,19 @@
 # Créditos / Credits
 
-## assets/sounds/brake_loop.wav
+## assets/sounds/brake_loop.wav e assets/sounds/brake_loop_low.wav
 
-Áudio "carreta temperatura alta" do mod de terceiro **ETS Brake Fade 0.8.1.2**, incluído
-sem alterações. **Não é coberto pela licença** deste projeto (PolyForm Noncommercial): os direitos pertencem ao
-autor original do mod. Foi incluído por decisão do mantenedor deste repositório, que assume
+Áudios "carreta temperatura alta" (`brake_loop.wav`) e "carreta temperatura baixa"
+(`brake_loop_low.wav`) do mod de terceiro **ETS Brake Fade 0.8.1.2**, incluídos
+sem alterações. **Não são cobertos pela licença** deste projeto (PolyForm Noncommercial): os direitos pertencem ao
+autor original do mod. Foram incluídos por decisão do mantenedor deste repositório, que assume
 a responsabilidade por essa redistribuição. Se você é o autor e quer a remoção ou uma
-atribuição diferente, abra uma issue e o arquivo será tratado de imediato.
+atribuição diferente, abra uma issue e os arquivos serão tratados de imediato.
 
-Audio "carreta temperatura alta" from the third-party mod **ETS Brake Fade 0.8.1.2**,
-included unmodified. It is **not covered by this project's license** (PolyForm Noncommercial): the rights belong
-to the mod's original author. It was included at the repository maintainer's decision, who
-takes responsibility for this redistribution. If you are the author and want it removed or
-credited differently, open an issue and the file will be dealt with promptly.
+Audio "carreta temperatura alta" (`brake_loop.wav`) and "carreta temperatura baixa" (`brake_loop_low.wav`) from the
+third-party mod **ETS Brake Fade 0.8.1.2**, included unmodified. They are **not covered by this project's license**
+(PolyForm Noncommercial): the rights belong to the mod's original author. They were included at the repository
+maintainer's decision, who takes responsibility for this redistribution. If you are the author and want them removed
+or credited differently, open an issue and the files will be dealt with promptly.
 
 ## assets/sounds/air_release.wav
 

@@ -22,7 +22,7 @@ struct AppState {
     bool unsaved = false;
 
     double pedal = 0, speedKmh = 0, heldS = 0;
-    std::string sound; // "nenhum", "freio", "ar"
+    std::string sound; // "nenhum", "freio" (temperatura baixa), "freio_alto", "ar"
 
     long long lastCommandSeq = 0;
     bool lastCommandOk = true;

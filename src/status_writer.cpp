@@ -29,7 +29,8 @@ const char *b(bool v) { return v ? "true" : "false"; }
 
 const char *soundName(SoundState s) {
     switch (s) {
-    case SoundState::Brake: return "freio";
+    case SoundState::BrakeLow: return "freio";
+    case SoundState::BrakeHigh: return "freio_alto";
     case SoundState::Air: return "ar";
     default: return "nenhum";
     }

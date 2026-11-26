@@ -27,6 +27,7 @@ quando ele é solto.
    plugins\airbrake_audio.ini
    plugins\AirbrakeAudio.exe
    plugins\airbrake_audio\brake_loop.wav
+   plugins\airbrake_audio\brake_loop_low.wav
    plugins\airbrake_audio\air_release.wav
    ```
 
@@ -46,7 +47,13 @@ quando ele é solto.
 - O atalho padrão (**Ctrl + =**) convive com o do [Trailer Control](https://github.com/khenrique99/ETS2---Trailer-Control) (**Ctrl + -**).
 
 Para usar seus próprios sons, coloque arquivos WAV PCM 16 bits (mono ou estéreo) em `plugins\airbrake_audio` e
-ajuste `file=` em `[brake]` e `[air_release]`. Para um loop de freio, defina `loop_start_s` (vale ao reiniciar o jogo).
+ajuste `file=` (temperatura alta) e `file_low=` (temperatura baixa) em `[brake]` e `file=` em `[air_release]`.
+Para os loops de freio, defina `loop_start_s` / `loop_start_low_s` (valem ao reiniciar o jogo).
+
+O freio tem dois sons: com o pedal até **65%** toca o de **temperatura baixa**; a partir disso, o de
+**temperatura alta**. A troca é cruzada com os fades (sem corte seco) e o limite é ajustável na aba Freio
+("Som de temperatura alta a partir de", `high_from` no `.ini`). A **saída de ar** só toca ao soltar o freio se a
+freada passou pelo menos **2 s** no som de temperatura alta (`min_high_time_s` em `[air_release]`, 0 = sempre).
 
 ## Não mexe na mecânica do jogo
 

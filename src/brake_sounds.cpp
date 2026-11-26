@@ -5,6 +5,12 @@
 
 namespace aa {
 
+namespace {
+
+constexpr BrakeLevel kLevels[kBrakeLevels] = {BrakeLevel::Low, BrakeLevel::High};
+
+} // namespace
+
 void BrakeSounds::update(float pedal, float speedKmh, double now) {
     if (!started_) {
         lastTick_ = now;
@@ -15,16 +21,19 @@ void BrakeSounds::update(float pedal, float speedKmh, double now) {
     lastTick_ = now;
 
     updateTrigger(pedal, now);
-    updateBrakeVolume(pedal, speedKmh, dt);
+    updateLevel(pedal);
+    if (braking_ && level_ == BrakeLevel::High) highHeldS_ += dt;
+    updateBrakeVolumes(pedal, speedKmh, dt);
     updateAirRelease(now);
 }
 
 void BrakeSounds::stopAll() {
-    out_.brakeStop();
+    for (BrakeLevel level : kLevels) {
+        out_.brakeStop(level);
+        voice(level) = Voice{};
+    }
     out_.airStop();
     braking_ = false;
-    brakeVoiceRunning_ = false;
-    brakeVolume_ = 0.0f;
     airPlaying_ = false;
 }
 
@@ -39,28 +48,87 @@ void BrakeSounds::applyConfig(const Config &config) {
 
 SoundState BrakeSounds::state() const {
     if (airPlaying_) return SoundState::Air;
-    if (brakeVoiceRunning_ && brakeVolume_ > 0.01f) return SoundState::Brake;
-    return SoundState::None;
+    // No cruzamento mostra o que estiver mais alto.
+    const Voice &low = voice(BrakeLevel::Low);
+    const Voice &high = voice(BrakeLevel::High);
+    const float lowVol = low.running ? low.volume : 0.0f;
+    const float highVol = high.running ? high.volume : 0.0f;
+    if (std::max(lowVol, highVol) <= 0.01f) return SoundState::None;
+    return highVol > lowVol ? SoundState::BrakeHigh : SoundState::BrakeLow;
 }
 
 void BrakeSounds::updateTrigger(float pedal, double now) {
     if (!braking_ && pedal >= config_.thresholdOn) {
         braking_ = true;
         pressedAt_ = now;
-        if (!brakeVoiceRunning_) {
-            out_.brakeStart();
-            brakeVoiceRunning_ = true;
-            brakeVolume_ = 0.0f;
-        }
+        highHeldS_ = 0.0f;
+        // Pisou direto no fundo: ja comeca no loop alto, sem passar pelo baixo.
+        level_ = pedal >= config_.brakeHighFrom ? BrakeLevel::High : BrakeLevel::Low;
+        startVoice(level_);
     } else if (braking_ && pedal <= config_.thresholdOff) {
         braking_ = false;
         const double heldMs = (now - pressedAt_) * 1000.0;
         const bool heldLongEnough = heldMs >= static_cast<double>(config_.airMinHoldMs);
         const bool cooledDown = (now - lastAirAt_) * 1000.0 >= static_cast<double>(config_.airCooldownMs);
-        if (heldLongEnough && cooledDown) {
+        // Freada leve (so no loop baixo, ou pouco tempo no alto) nao solta ar. 0 desliga a exigencia.
+        const bool hotEnough = config_.airMinHighS <= 0.0f || highHeldS_ >= config_.airMinHighS;
+        if (heldLongEnough && cooledDown && hotEnough) {
             playAirRelease(heldMs, now);
             lastAirAt_ = now;
         }
+    }
+}
+
+// Troca de loop durante a freada. Nada e cortado seco: o loop que sai desce com fade_out e o que
+// entra sobe com fade_in (updateBrakeVolumes).
+void BrakeSounds::updateLevel(float pedal) {
+    if (!braking_) return;
+    if (level_ == BrakeLevel::Low && pedal >= config_.brakeHighFrom) {
+        level_ = BrakeLevel::High;
+        startVoice(level_);
+    } else if (level_ == BrakeLevel::High && pedal < config_.brakeHighFrom - kHighHysteresis) {
+        level_ = BrakeLevel::Low;
+        startVoice(level_);
+    }
+}
+
+// Um loop que ainda esta saindo em fade continua de onde esta (sem reiniciar o ataque).
+void BrakeSounds::startVoice(BrakeLevel level) {
+    Voice &v = voice(level);
+    if (v.running) return;
+    out_.brakeStart(level);
+    v.running = true;
+    v.volume = 0.0f;
+}
+
+// O volume do freio segue o pedal; os fades suavizam cada mudanca (e o cruzamento dos loops).
+void BrakeSounds::updateBrakeVolumes(float pedal, float speedKmh, float dt) {
+    float target = 0.0f;
+    if (braking_ && speedKmh >= config_.minSpeedKmh)
+        target = config_.volMin + (config_.volMax - config_.volMin) * std::min(1.0f, pedal);
+
+    for (BrakeLevel level : kLevels) updateVoice(level, level == level_ ? target : 0.0f, dt);
+}
+
+void BrakeSounds::updateVoice(BrakeLevel level, float target, float dt) {
+    Voice &v = voice(level);
+    if (!v.running) return;
+
+    if (v.volume < target) {
+        v.volume = config_.fadeInMs > 0.0f ? std::min(target, v.volume + dt / (config_.fadeInMs / 1000.0f)) : target;
+    } else {
+        v.volume =
+            config_.fadeOutMs > 0.0f ? std::max(target, v.volume - dt / (config_.fadeOutMs / 1000.0f)) : target;
+    }
+
+    // O loop ativo de uma freada fica vivo mesmo mudo (abaixo da velocidade minima); os outros
+    // param ao chegar no silencio.
+    const bool active = braking_ && level == level_;
+    if (!active && v.volume <= 0.0005f) {
+        out_.brakeStop(level);
+        v = Voice{};
+    } else {
+        out_.brakeSetVolume(level, v.volume);
     }
 }
 
@@ -78,31 +146,6 @@ void BrakeSounds::playAirRelease(double heldMs, double now) {
     airStartedAt_ = now;
     airPlaying_ = true;
     out_.airPlay(airVolume_);
-}
-
-// O volume do freio segue o pedal; os fades suavizam cada mudanca.
-void BrakeSounds::updateBrakeVolume(float pedal, float speedKmh, float dt) {
-    if (!brakeVoiceRunning_) return;
-
-    float target = 0.0f;
-    if (braking_ && speedKmh >= config_.minSpeedKmh)
-        target = config_.volMin + (config_.volMax - config_.volMin) * std::min(1.0f, pedal);
-
-    if (brakeVolume_ < target) {
-        brakeVolume_ = config_.fadeInMs > 0.0f ? std::min(target, brakeVolume_ + dt / (config_.fadeInMs / 1000.0f))
-                                               : target;
-    } else {
-        brakeVolume_ = config_.fadeOutMs > 0.0f ? std::max(target, brakeVolume_ - dt / (config_.fadeOutMs / 1000.0f))
-                                                : target;
-    }
-
-    if (!braking_ && brakeVolume_ <= 0.0005f) {
-        out_.brakeStop();
-        brakeVoiceRunning_ = false;
-        brakeVolume_ = 0.0f;
-    } else {
-        out_.brakeSetVolume(brakeVolume_);
-    }
 }
 
 // Saida de ar cortada fecha com fade exponencial (-80 dB) em vez de parar seco.
