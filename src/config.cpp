@@ -19,6 +19,8 @@ namespace {
 const FloatField kFields[] = {
     {"output", "boost_db", &Config::boostDb, 0.0f, 18.0f},
     {"brake", "loop_start_s", &Config::loopStartS, 0.0f, 600.0f, false},
+    {"brake", "loop_start_low_s", &Config::loopStartLowS, 0.0f, 600.0f, false},
+    {"brake", "high_from", &Config::brakeHighFrom, 0.05f, 1.0f},
     {"brake", "fade_in_ms", &Config::fadeInMs, 0.0f, 5000.0f},
     {"brake", "fade_out_ms", &Config::fadeOutMs, 0.0f, 5000.0f},
     {"brake", "volume_min", &Config::volMin, 0.0f, 1.0f},
@@ -32,6 +34,7 @@ const FloatField kFields[] = {
     {"air_release", "cut_fade_ms", &Config::airCutFadeMs, 5.0f, 2000.0f},
     {"air_release", "min_brake_time_ms", &Config::airMinHoldMs, 0.0f, 10000.0f},
     {"air_release", "cooldown_ms", &Config::airCooldownMs, 0.0f, 60000.0f},
+    {"air_release", "min_high_time_s", &Config::airMinHighS, 0.0f, 60.0f},
     {"trigger", "threshold_on", &Config::thresholdOn, 0.01f, 0.9f},
     {"trigger", "threshold_off", &Config::thresholdOff, 0.0f, 0.9f},
 };
@@ -93,6 +96,8 @@ Config configFromIni(const std::string &iniText) {
 
     const std::string brake = ini::get(iniText, "brake", "file");
     if (!brake.empty()) c.brakeFile = ipc::widen(brake);
+    const std::string brakeLow = ini::get(iniText, "brake", "file_low");
+    if (!brakeLow.empty()) c.brakeLowFile = ipc::widen(brakeLow);
     const std::string air = ini::get(iniText, "air_release", "file");
     if (!air.empty()) c.airFile = ipc::widen(air);
 

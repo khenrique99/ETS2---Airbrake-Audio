@@ -12,6 +12,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and the proje
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-26
+
+**Português:** o freio passa a ter dois sons (temperatura baixa e alta, conforme a força no pedal) e a saída de ar só toca depois de uma freada forte.
+
+**English:** the brake now has two sounds (low and high temperature, by pedal force) and the air release only plays after a hard brake application.
+
+### Adicionado / Added
+
+- Dois sons de freio: com o pedal até **65%** toca o de **temperatura baixa** (`brake_loop_low.wav`); a partir disso, o de **temperatura alta** (`brake_loop.wav`), com troca cruzada pelos fades e histerese de 3 pontos. Limite ajustável na aba Freio (`brake.high_from`); a tela mostra qual dos dois está tocando.
+  / Two brake sounds: with the pedal up to **65%** the **low temperature** one plays (`brake_loop_low.wav`); from there on, the **high temperature** one (`brake_loop.wav`), crossfaded through the fades with 3-point hysteresis. Threshold adjustable in the Brake tab (`brake.high_from`); the window shows which one is playing.
+
+### Alterado / Changed
+
+- A saída de ar só toca se a freada passou pelo menos **2 s** (somados) no som de temperatura alta (pedal acima de 65%); freada leve não solta ar. Ajustável na aba Saída de ar (`air_release.min_high_time_s`, 0 = comportamento antigo).
+  / The air release only plays if the brake application spent at least **2 s** (summed) on the high temperature sound (pedal above 65%); light braking releases no air. Adjustable in the Air release tab (`air_release.min_high_time_s`, 0 = old behavior).
+
 ## [2.0.0] - 2026-11-25
 
 **Português:** a tela de configuração deixa de ser uma página no navegador e vira o **AirbrakeAudio.exe**, com a mesma identidade visual do Trailer Control. O código do plugin foi dividido em componentes e ganhou testes.
@@ -115,4 +131,5 @@ validated in-game.
 - Sons padrão, script de build MSVC, projeto CMake e documentação em português/inglês.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
+[2.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.1.0%2Bets2.1.62
 [2.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.0.0%2Bets2.1.62

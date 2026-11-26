@@ -36,13 +36,32 @@ bool approx(double a, double b, double eps = 1e-4) { return std::fabs(a - b) <= 
 
 // ---- saida de som falsa: registra as chamadas
 struct FakeOutput final : aa::ISoundOutput {
+    // Totais (qualquer nivel) e por nivel do freio.
     int brakeStarts = 0, brakeStops = 0, airPlays = 0, airStops = 0, boosts = 0;
-    float brakeVolume = 0, airVolume = 0, lastBoost = -1;
+    int starts[aa::kBrakeLevels] = {}, stops[aa::kBrakeLevels] = {};
+    bool playing[aa::kBrakeLevels] = {};
+    float volume[aa::kBrakeLevels] = {};
+    float brakeVolume = 0, airVolume = 0, lastBoost = -1; // brakeVolume: ultimo volume definido
     float airLen = 2.0f;
 
-    void brakeStart() override { ++brakeStarts; }
-    void brakeSetVolume(float v) override { brakeVolume = v; }
-    void brakeStop() override { ++brakeStops; }
+    static int idx(aa::BrakeLevel l) { return static_cast<int>(l); }
+    void brakeStart(aa::BrakeLevel l) override {
+        ++brakeStarts;
+        ++starts[idx(l)];
+        playing[idx(l)] = true;
+        volume[idx(l)] = 0;
+    }
+    void brakeSetVolume(aa::BrakeLevel l, float v) override {
+        brakeVolume = v;
+        volume[idx(l)] = v;
+    }
+    void brakeStop(aa::BrakeLevel l) override {
+        ++brakeStops;
+        ++stops[idx(l)];
+        playing[idx(l)] = false;
+        volume[idx(l)] = 0;
+    }
+    float vol(aa::BrakeLevel l) const { return playing[idx(l)] ? volume[idx(l)] : 0.0f; }
     void airPlay(float v) override {
         ++airPlays;
         airVolume = v;
@@ -110,7 +129,13 @@ void testConfig() {
     CHECK(c.thresholdOff < c.thresholdOn);         // histerese valida
 
     c = aa::configFromIni("[brake]\nfile=meu.wav ; comentario\nfade_in_ms=abc\n[ui]\nweb_ui=off\nhotkey=Minus\n");
-    CHECK(c.brakeFile == L"meu.wav");
+    CHECK(c.brakeFile == L"meu.wav" && c.brakeLowFile == L"brake_loop_low.wav");
+    CHECK(approx(c.brakeHighFrom, 0.65));
+    c = aa::configFromIni("[brake]\nfile_low=baixo.wav\nhigh_from=0.8\n");
+    CHECK(c.brakeLowFile == L"baixo.wav" && approx(c.brakeHighFrom, 0.8));
+    c = aa::configFromIni("[brake]\nhigh_from=7\n");
+    CHECK(approx(c.brakeHighFrom, 1.0)); // limitado
+    c = aa::configFromIni("[brake]\nfile=meu.wav ; comentario\nfade_in_ms=abc\n[ui]\nweb_ui=off\nhotkey=Minus\n");
     CHECK(approx(c.fadeInMs, 60.0));                 // lixo -> padrao
     CHECK(!c.appEnabled);                          // nome da 1.x
     CHECK(c.hotkey == "Minus");                    // formato antigo ainda vale
@@ -170,10 +195,68 @@ void testBrakeSounds() {
         run(s, 1.0f, 50.0f, now, 0.5);
         CHECK(out.brakeStarts == 1);
         CHECK(approx(out.brakeVolume, cfg.volMax, 0.01));
-        CHECK(s.state() == aa::SoundState::Brake);
+        CHECK(s.state() == aa::SoundState::BrakeHigh); // pedal no fundo: temperatura alta
         run(s, 0.0f, 50.0f, now, 1.0); // solta
         CHECK(out.brakeStops >= 1);
         CHECK(s.state() == aa::SoundState::Air || s.state() == aa::SoundState::None);
+    }
+    // Dois loops: ate high_from (65%) toca o de temperatura baixa; acima, o de temperatura alta
+    {
+        using aa::BrakeLevel;
+        FakeOutput out;
+        aa::Config cfg;
+        aa::BrakeSounds s(out, cfg);
+        double now = 0;
+        run(s, 0.4f, 50.0f, now, 0.5);                 // pedal leve
+        CHECK(out.starts[0] == 1 && out.starts[1] == 0);
+        CHECK(s.state() == aa::SoundState::BrakeLow && s.level() == BrakeLevel::Low);
+        CHECK(approx(out.vol(BrakeLevel::Low), cfg.volMin + (cfg.volMax - cfg.volMin) * 0.4f, 0.01));
+
+        run(s, 0.64f, 50.0f, now, 0.5);                // ainda abaixo de 65%
+        CHECK(out.starts[1] == 0 && s.level() == BrakeLevel::Low);
+
+        run(s, 0.65f, 50.0f, now, 0.016);              // exatamente 65%: troca
+        CHECK(out.starts[1] == 1 && s.level() == BrakeLevel::High);
+        CHECK(out.playing[0]);                          // o baixo sai em fade, nao corta seco
+        run(s, 0.8f, 50.0f, now, 0.5);
+        CHECK(!out.playing[0] && out.stops[0] == 1);   // terminou o fade e parou
+        CHECK(approx(out.vol(BrakeLevel::High), cfg.volMin + (cfg.volMax - cfg.volMin) * 0.8f, 0.01));
+        CHECK(s.state() == aa::SoundState::BrakeHigh);
+
+        run(s, 0.63f, 50.0f, now, 0.5);                // dentro da histerese: continua alto
+        CHECK(s.level() == BrakeLevel::High && out.starts[0] == 1);
+        run(s, 0.5f, 50.0f, now, 0.5);                 // desceu de verdade: volta ao baixo, do comeco
+        CHECK(s.level() == BrakeLevel::Low && out.starts[0] == 2 && !out.playing[1]);
+        CHECK(s.state() == aa::SoundState::BrakeLow);
+
+        // vai e volta rapido: o loop que ainda esta saindo nao reinicia o ataque
+        run(s, 0.9f, 50.0f, now, 0.05);
+        run(s, 0.3f, 50.0f, now, 0.05);
+        CHECK(out.starts[0] == 2 && out.starts[1] == 2);
+
+        run(s, 0.0f, 50.0f, now, 1.0);                 // solta: os dois param
+        CHECK(!out.playing[0] && !out.playing[1]);
+    }
+    // Pisar direto no fundo comeca no loop alto, sem tocar o baixo
+    {
+        FakeOutput out;
+        aa::Config cfg;
+        aa::BrakeSounds s(out, cfg);
+        double now = 0;
+        run(s, 0.9f, 50.0f, now, 0.3);
+        CHECK(out.starts[0] == 0 && out.starts[1] == 1);
+    }
+    // high_from = 1: so o pedal no fundo toca o alto
+    {
+        FakeOutput out;
+        aa::Config cfg;
+        cfg.brakeHighFrom = 1.0f;
+        aa::BrakeSounds s(out, cfg);
+        double now = 0;
+        run(s, 0.95f, 50.0f, now, 0.3);
+        CHECK(out.starts[1] == 0);
+        run(s, 1.0f, 50.0f, now, 0.3);
+        CHECK(out.starts[1] == 1);
     }
     // Abaixo da velocidade minima o freio fica mudo
     {
@@ -185,9 +268,11 @@ void testBrakeSounds() {
         CHECK(out.brakeStarts == 1 && out.brakeVolume < 0.01f);
     }
     // Saida de ar: freada curta toca mais baixo que longa; muito curta nao toca; cooldown segura
+    // (sem a exigencia do loop alto, testada abaixo)
     {
         FakeOutput out;
         aa::Config cfg;
+        cfg.airMinHighS = 0.0f;
         aa::BrakeSounds s(out, cfg);
         double now = 0;
         run(s, 1.0f, 50.0f, now, 0.2);  // abaixo do minimo (400 ms)
@@ -210,6 +295,39 @@ void testBrakeSounds() {
 
         // freada logo em seguida: cooldown
         run(s, 1.0f, 50.0f, now, 0.6);
+        run(s, 0.0f, 50.0f, now, 0.05);
+        CHECK(out.airPlays == 2);
+    }
+    // Saida de ar so depois de 2 s acima de 65% (loop alto)
+    {
+        FakeOutput out;
+        aa::Config cfg;
+        aa::BrakeSounds s(out, cfg);
+        double now = 0;
+        run(s, 0.5f, 50.0f, now, 7.0);   // longa, mas so no loop baixo
+        run(s, 0.0f, 50.0f, now, 0.05);
+        CHECK(out.airPlays == 0);
+        run(s, 0.0f, 50.0f, now, 2.0);
+
+        run(s, 0.9f, 50.0f, now, 1.5);   // alto por pouco tempo
+        run(s, 0.0f, 50.0f, now, 0.05);
+        CHECK(out.airPlays == 0);
+        run(s, 0.0f, 50.0f, now, 2.0);
+
+        run(s, 0.5f, 50.0f, now, 3.0);   // baixo nao conta...
+        run(s, 0.9f, 50.0f, now, 1.0);   // ...so o tempo no alto
+        run(s, 0.0f, 50.0f, now, 0.05);
+        CHECK(out.airPlays == 0);
+        run(s, 0.0f, 50.0f, now, 2.0);
+
+        run(s, 0.9f, 50.0f, now, 2.1);   // passou de 2 s no alto
+        run(s, 0.0f, 50.0f, now, 0.05);
+        CHECK(out.airPlays == 1);
+        run(s, 0.0f, 50.0f, now, 3.0);
+
+        run(s, 0.9f, 50.0f, now, 1.2);   // somado: 1,2 s + 1,2 s no alto na mesma freada
+        run(s, 0.5f, 50.0f, now, 0.5);
+        run(s, 0.9f, 50.0f, now, 1.2);
         run(s, 0.0f, 50.0f, now, 0.05);
         CHECK(out.airPlays == 2);
     }
@@ -291,7 +409,7 @@ void testJsonAndModel() {
     info.config = &cfg;
     info.pedal = 0.5f;
     info.speedKmh = 42.0f;
-    info.sound = aa::SoundState::Brake;
+    info.sound = aa::SoundState::BrakeLow;
     info.unsaved = true;
     info.lastCommandSeq = 9;
     info.lastCommandResult = "ok \"aspas\"";

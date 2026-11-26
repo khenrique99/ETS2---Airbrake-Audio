@@ -116,6 +116,7 @@ const FieldView kDemoFields[] = {
     {"output.boost_db", 6, 0, 18, 6},
     {"brake.volume_min", 0.35, 0, 1, 0.35},
     {"brake.volume_max", 1, 0, 1, 1},
+    {"brake.high_from", 0.65, 0.05, 1, 0.65},
     {"brake.min_speed_kmh", 3, 0, 200, 3},
     {"brake.fade_in_ms", 60, 0, 5000, 60},
     {"brake.fade_out_ms", 200, 0, 5000, 200},
@@ -127,6 +128,7 @@ const FieldView kDemoFields[] = {
     {"air_release.cut_fade_ms", 120, 5, 2000, 120},
     {"air_release.min_brake_time_ms", 400, 0, 10000, 400},
     {"air_release.cooldown_ms", 1500, 0, 60000, 1500},
+    {"air_release.min_high_time_s", 2, 0, 60, 2},
     {"trigger.threshold_on", 0.05, 0.01, 0.9, 0.05},
     {"trigger.threshold_off", 0.02, 0, 0.9, 0.02},
 };
@@ -188,7 +190,9 @@ bool DemoSource::poll(AppState &state) {
     sim_.pedal = braking ? 0.55 + 0.35 * std::sin(phase * 2.0) : 0.0;
     sim_.speedKmh = braking ? std::max(0.0, 62.0 - phase * 12.0) : 32.0 + (phase - 2.5) * 8.0;
     sim_.heldS = braking ? phase : 0.0;
-    sim_.sound = braking ? "freio" : (phase < 3.6 ? "ar" : "nenhum");
+    const FieldView *highFrom = sim_.field("brake.high_from");
+    const bool high = braking && highFrom && sim_.pedal >= highFrom->value;
+    sim_.sound = braking ? (high ? "freio_alto" : "freio") : (phase < 3.6 ? "ar" : "nenhum");
     state = sim_;
     return true;
 }

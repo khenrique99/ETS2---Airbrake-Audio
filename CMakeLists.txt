@@ -57,6 +57,7 @@ add_custom_command(TARGET airbrake_audio POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:airbrake_audio>/airbrake_audio"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/assets/sounds/brake_loop.wav"
+        "${CMAKE_SOURCE_DIR}/assets/sounds/brake_loop_low.wav"
         "${CMAKE_SOURCE_DIR}/assets/sounds/air_release.wav"
         "$<TARGET_FILE_DIR:airbrake_audio>/airbrake_audio/")
 
