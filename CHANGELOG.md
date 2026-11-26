@@ -12,6 +12,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and the proje
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-26
+
+**Português:** o freio passa a ter dois sons (temperatura baixa e alta, conforme a força no pedal) e a saída de ar só toca depois de uma freada forte.
+
+**English:** the brake now has two sounds (low and high temperature, by pedal force) and the air release only plays after a hard brake application.
+
 ### Adicionado / Added
 
 - Dois sons de freio: com o pedal até **65%** toca o de **temperatura baixa** (`brake_loop_low.wav`); a partir disso, o de **temperatura alta** (`brake_loop.wav`), com troca cruzada pelos fades e histerese de 3 pontos. Limite ajustável na aba Freio (`brake.high_from`); a tela mostra qual dos dois está tocando.
@@ -125,4 +131,5 @@ validated in-game.
 - Sons padrão, script de build MSVC, projeto CMake e documentação em português/inglês.
   / Default sounds, MSVC build script, CMake project and Portuguese/English documentation.
 
+[2.1.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.1.0%2Bets2.1.62
 [2.0.0]: https://github.com/khenrique99/ETS2---Airbrake-Audio/releases/tag/v2.0.0%2Bets2.1.62
