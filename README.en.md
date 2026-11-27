@@ -2,12 +2,12 @@
 
 [🇧🇷 Português](README.md) · **🇺🇸 English**
 
-A **sound** plugin for **Euro Truck Simulator 2** (and ATS) plus a window (**AirbrakeAudio.exe**) to tune everything
-from inside the game. It plays a glazed-lining brake squeal while the pedal is pressed and an air release when it is let go.
+A **sound** plugin for **Euro Truck Simulator 2** (and ATS) with an **in-game panel** to tune everything
+(and **AirbrakeAudio.exe**, the same screen in a separate window). It plays a glazed-lining brake squeal while the pedal is pressed and an air release when it is let go.
 
 | | |
 |---|---|
-| **Version** | 2.0.0 |
+| **Version** | 2.2.0-beta.1 (in-game panel beta; stable: 2.1.0) |
 | **Game** | ETS2 **1.62.x** (Steam, 64-bit); it only reads the pedal and speed through the Telemetry SDK |
 | **System** | Windows 10/11 64-bit |
 | **Mode** | single-player and multiplayer (it only plays local audio, it changes nothing in the game) |
@@ -35,13 +35,18 @@ from inside the game. It plays a glazed-lining brake squeal while the pedal is p
 
 ## Usage
 
-- **Ctrl + =** in game opens the window on top. **Esc** or the same shortcut goes back to the game.
-- The window shows the pedal, speed, brake time and the sound playing, live.
+- **Ctrl + =** in game opens the panel **over the game image**, without taking the game out of the foreground.
+  It needs ETS2 on **DirectX 11** (the default). While it is open, mouse and keyboard go only to the panel and the
+  game keeps running behind it (you can brake and hear the change). **Esc**, **Close** or the same shortcut closes it.
+- The panel shows the pedal, speed, brake time and the sound playing, live.
 - **Settings** (Brake, Air release, General tabs) apply immediately; **Save** writes `airbrake_audio.ini`
   keeping its comments. **Restore defaults** resets everything (and only writes if you save).
-- **Configurações** (footer, "Settings"): change the shortcut that opens the window — click **Change…**, press the combination, **Save**.
-- **PT/EN** switches the window language. **Demo** simulates brake applications without the game running.
-- Run the game in **borderless windowed** for the window to appear on top; in exclusive fullscreen Windows may hide it.
+- Without a mouse: **↑ ↓** pick a setting, **← →** change its value, **Tab** switches tab and **Ctrl + S** saves.
+- **PT/EN** switches the panel language.
+- The shortcut that opens the panel is `[ui] hotkey` in `airbrake_audio.ini`. `[ui] mode = external` goes back to the
+  separate **AirbrakeAudio.exe** window (with **Settings** to change the shortcut and **Demo**, which simulates brake
+  applications without the game running). If the in-game panel cannot install (game not on DirectX 11), the plugin
+  opens `AirbrakeAudio.exe` by itself. On **TruckersMP** the in-game panel is turned off.
 - The default shortcut (**Ctrl + =**) coexists with [Trailer Control](https://github.com/khenrique99/ETS2---Trailer-Control) (**Ctrl + -**).
 
 To use your own sounds, put 16-bit PCM WAV files (mono or stereo) in `plugins\airbrake_audio` and set `file=` in
@@ -56,7 +61,9 @@ brake application spent at least **2 s** on the high temperature sound (`min_hig
 ## It does not touch game mechanics
 
 The plugin only **reads** the brake pedal and speed through the official SCS Telemetry SDK and plays audio. It does not
-change brake temperature, braking force or physics, and it does not read or patch game memory. It coexists with
+change brake temperature, braking force or physics, and it does not read or patch game memory. The in-game panel draws
+over the frame by detouring DirectX 11's `Present` (the function table of `dxgi.dll`, inside the game process); no
+`eurotrucks2.exe` code is modified. It coexists with
 brake-heating plugins. If another plugin also plays brake sounds, both play at once: turn the sound off in that plugin's
 own configuration instead of deleting its files.
 
@@ -65,7 +72,8 @@ own configuration instead of deleting its files.
 ### Build
 
 Requires Visual Studio 2022 or Build Tools (Desktop C++); CMake ships with it. **No SCS SDK download needed**
-(`src/scs_sdk_min.h` declares only what is used).
+(`src/scs_sdk_min.h` declares only what is used). The panel's [Dear ImGui](https://github.com/ocornut/imgui) (MIT,
+v1.91.9) is downloaded by CMake on the first configure (needs internet and `git`); it is not in the repository.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\build.ps1
@@ -79,6 +87,9 @@ and the game version (`-GameTag ETS2-1.62`, the default). `-SkipTests` skips the
 - `aa_tests` — WAV, configuration, brake logic (with a fake audio output), commands, shortcuts, JSON and the window model.
 - `plugin_selftest` — the **fake game** (`tests/fake_game.cpp`) loads the real DLL through the SDK, simulates the pedal
   and sends commands like the window would, checking `status.json`.
+- `fake_game --overlay` (manual, needs a display): opens a real DirectX 11 window, opens the panel in it, takes
+  "photos", adjusts controls by keyboard and (with `--mouse`) by click and drag, and checks `status.json`:
+  `build\Release\fake_game.exe build\Release\airbrake_audio.dll --overlay photo.bmp --mouse`.
 
 In-game script: [docs/TESTING-IN-GAME.md](docs/TESTING-IN-GAME.md).
 
