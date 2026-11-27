@@ -15,23 +15,29 @@
 param(
     [Parameter(Mandatory)] [string]$Game,
     [Parameter(Mandatory)] [string]$NotesFile,
-    [switch]$Prerelease
+    [switch]$Prerelease,
+    # Branch de onde sai a release (main para estavel; dev para beta, como no Trailer Control)
+    [string]$Branch = 'main',
+    # Sufixo do zip igual ao -GameTag do build (ex.: -GameTag ETS2-1.62-beta -> -ZipSuffix -beta)
+    [string]$ZipSuffix = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
-$version = ([regex]::Match((Get-Content "$root\src\version.h" -Raw), 'AIRBRAKE_AUDIO_VERSION\s+"(\d+\.\d+\.\d+)"')).Groups[1].Value
-if (-not $version) { throw 'Versao nao encontrada em src\version.h' }
-$tag = "v$version+ets2.$Game"
-$zip = "dist\AirbrakeAudio-v$version-ETS2-$Game-plugins.zip"
+# Versao completa (pode ter sufixo de beta: 2.2.0-beta.1) para a tag; so a parte numerica no nome do zip.
+$full = ([regex]::Match((Get-Content "$root\src\version.h" -Raw), 'AIRBRAKE_AUDIO_VERSION\s+"([^"]+)"')).Groups[1].Value
+if (-not $full) { throw 'Versao nao encontrada em src\version.h' }
+$version = ([regex]::Match($full, '^\d+\.\d+\.\d+')).Value
+$tag = "v$full+ets2.$Game"
+$zip = "dist\AirbrakeAudio-v$version-ETS2-$Game$ZipSuffix-plugins.zip"
 if (-not (Test-Path $zip)) { throw "Zip nao encontrado: $zip. Rode scripts\build.ps1 -GameTag ETS2-$Game." }
 if (-not (Test-Path $NotesFile)) { throw "Notas nao encontradas: $NotesFile" }
-if ((git branch --show-current) -ne 'main') { throw 'Publique a release a partir da main.' }
+if ((git branch --show-current) -ne $Branch) { throw "Publique a release a partir da $Branch." }
 if (git status --porcelain) { throw 'Working tree com alteracoes.' }
 
-$args = @('release', 'create', $tag, $zip, '--title', "Airbrake Audio v$version - ETS2 $Game.x", '--notes-file', $NotesFile, '--target', 'main')
+$args = @('release', 'create', $tag, $zip, '--title', ("Airbrake Audio v$full - ETS2 $Game.x" + $(if ($Prerelease) { ' (BETA de teste)' } else { '' })), '--notes-file', $NotesFile, '--target', $Branch)
 if ($Prerelease) { $args += '--prerelease' }
 gh @args
 if ($LASTEXITCODE -ne 0) { throw 'gh release create falhou' }

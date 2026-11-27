@@ -12,6 +12,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/) and the proje
 
 ## [Unreleased]
 
+## [2.2.0-beta.1] - 2026-11-27
+
+**Português:** a tela de ajustes agora abre **dentro do jogo**, como no Trailer Control (beta).
+
+**English:** the settings screen now opens **inside the game**, like in Trailer Control (beta).
+
+### Adicionado / Added
+
+- **Painel dentro do jogo** (beta): **Ctrl + =** abre o painel por cima da imagem do ETS2, sem tirar o jogo de primeiro plano. Desenhado com Dear ImGui (MIT) por um desvio no `Present` do DirectX 11 (tabela de funções do `dxgi.dll`; nenhum código do exe do jogo é alterado e nada é lido da memória). Com ele aberto, mouse e teclado vão só para o painel (o jogo segue rodando atrás); **Esc**, **Fechar** ou o atalho fecham; setas, Tab e Ctrl + S são a alternativa ao mouse. Mesmo visual e funções do app externo: pedal, velocidade, tempo de freada, som tocando, ajustes por aba, Salvar, Restaurar padrão e PT/EN.
+  / **In-game panel** (beta): **Ctrl + =** opens the panel over the ETS2 image without taking the game out of the foreground. Drawn with Dear ImGui (MIT) through a detour on DirectX 11's `Present` (the `dxgi.dll` function table; no game exe code is modified and nothing is read from memory). While open, mouse and keyboard go only to the panel (the game keeps running behind it); **Esc**, **Close** or the shortcut closes it; arrows, Tab and Ctrl + S replace the mouse. Same look and features as the external app: pedal, speed, brake time, sound playing, settings by tab, Save, Restore defaults and PT/EN.
+- `[ui] mode = game | external` no `.ini`. Se o desvio não instalar (jogo fora do DX11, erro) o plugin abre o `AirbrakeAudio.exe` sozinho; desligado no TruckersMP.
+  / `[ui] mode = game | external` in the `.ini`. If the detour cannot install (game not on DX11, error) the plugin opens `AirbrakeAudio.exe` by itself; off on TruckersMP.
+- `fake_game --overlay [--mouse]`: janela DirectX 11 de verdade que abre o painel, tira fotos, ajusta controles por teclado, clique e arrasto e confere o `status.json`. Testado **só com o jogo falso**; falta o ETS2 de verdade.
+  / `fake_game --overlay [--mouse]`: a real DirectX 11 window that opens the panel, takes photos, adjusts controls by keyboard, click and drag and checks `status.json`. Tested **only with the fake game**; the real ETS2 is still missing.
+- `THIRD-PARTY-NOTICES.txt` (licença do Dear ImGui) junto da release. / `THIRD-PARTY-NOTICES.txt` (Dear ImGui license) shipped with the release.
+
+### Alterado / Changed
+
+- O idioma e a aba do painel ficam no `app.ini` (`Documentos\ETS2AirbrakeAudio`), compartilhados com o `AirbrakeAudio.exe`. / The panel's language and tab live in `app.ini` (`Documents\ETS2AirbrakeAudio`), shared with `AirbrakeAudio.exe`.
+- O `AppBridge` atende também os comandos do painel (mesma lógica do `command.txt`), e o CMake baixa o Dear ImGui na primeira configuração. / `AppBridge` also serves the panel's commands (same logic as `command.txt`), and CMake downloads Dear ImGui on the first configure.
+
 ## [2.1.0] - 2026-11-26
 
 **Português:** o freio passa a ter dois sons (temperatura baixa e alta, conforme a força no pedal) e a saída de ar só toca depois de uma freada forte.

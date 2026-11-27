@@ -1,8 +1,9 @@
 # CLAUDE.md — ETS2 Airbrake Audio
 
-Plugin nativo (DLL x64, C++17) de **som de freio** para Euro Truck Simulator 2 (e ATS), mais o app
-`AirbrakeAudio.exe` que mostra métricas ao vivo e ajusta o plugin. Só lê pedal e velocidade pelo
-Telemetry SDK oficial; nunca toca na memória do jogo.
+Plugin nativo (DLL x64, C++17) de **som de freio** para Euro Truck Simulator 2 (e ATS), com um **painel dentro do
+jogo** (Dear ImGui sobre o DirectX 11) que mostra métricas ao vivo e ajusta o plugin, e o app `AirbrakeAudio.exe`
+(mesma tela em janela separada, usada como alternativa). Só lê pedal e velocidade pelo Telemetry SDK oficial; nunca
+toca na memória do jogo.
 
 Repositório: https://github.com/khenrique99/ETS2---Airbrake-Audio
 
@@ -34,7 +35,11 @@ Projeto irmão (mesmo padrão de arquitetura, tela e releases): `ETS2---Trailer-
 `<tipo>(<escopo>): <resumo no imperativo, minúsculo, sem ponto>`
 
 Tipos: `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `chore`.
-Escopos: `audio`, `brake`, `config`, `app`, `ipc`, `hotkeys`, `build`, `docs`.
+Escopos: `audio`, `brake`, `config`, `app`, `overlay`, `ipc`, `hotkeys`, `build`, `docs`.
+
+Betas (ex.: `2.2.0-beta.1`): a versão em `src/version.h` leva o sufixo; a tag é `v2.2.0-beta.1+ets2.1.62` **na `dev`**
+(a `main` continua na estável), com `scripts/build.ps1 -GameTag ETS2-1.62-beta` e
+`scripts/publish-release.ps1 -Game 1.62 -Branch dev -ZipSuffix -beta -Prerelease -NotesFile ...` (pré-lançamento no GitHub).
 
 ### 1.4 Versionamento e releases
 - SemVer. **Fonte única da versão: `src/version.h`** (plugin, app, CMake e `build.ps1` leem de lá).
@@ -49,6 +54,12 @@ Escopos: `audio`, `brake`, `config`, `app`, `ipc`, `hotkeys`, `build`, `docs`.
 
 ### 1.5 Escopo e segurança
 - O plugin **só lê** telemetria e toca áudio. Nada de ler/escrever memória do jogo.
+- Única exceção de "mexer em algo do processo": o painel dentro do jogo troca os ponteiros `Present`/`Present1` da
+  vtable do `IDXGISwapChain` (no `dxgi.dll`) e subclassa a janela do jogo, só enquanto o painel existe. Nunca
+  patch no `eurotrucks2.exe`, nunca ler/escrever memória do jogo. Desligado no **TruckersMP** (risco de banimento) e
+  desfeito no `scs_telemetry_shutdown`. Se não instalar (jogo fora do DX11), cai no `AirbrakeAudio.exe`.
+- Dear ImGui (MIT) vem por `FetchContent` (tag fixa), não é versionado; a licença vai em `THIRD-PARTY-NOTICES.txt`
+  dentro do zip da release.
 - Nunca versionar binários do jogo nem áudio sem direito de redistribuição (`assets/private/` é ignorado).
   O som de freio é de terceiros: manter `CREDITS.md` correto.
 - Licença: **PolyForm Noncommercial 1.0.0**, copyright de Kelvin Henrique Ferreira (ninguém pode vender). Não voltar para MIT nem
@@ -75,7 +86,11 @@ Escopos: `audio`, `brake`, `config`, `app`, `ipc`, `hotkeys`, `build`, `docs`.
 - Callbacks de telemetria rodam na **thread do jogo** e nunca esperam por outra thread.
 - `AppBridge` (thread própria) lê `command.txt`, aplica numa **cópia** dos ajustes e grava `status.json`; o jogo pega
   a cópia com `takePending()` no `frame_end`. O jogo publica métricas por atomics (`Metrics`).
-- `HotkeyListener` só chama `showSettingsApp()`; nunca mexe no áudio.
+- `HotkeyListener` só abre/fecha o painel (`Overlay::toggle()`, uma flag) ou chama `showSettingsApp()`; nunca mexe no áudio.
+- Painel dentro do jogo: os hooks e o ImGui rodam na **thread de render**, nunca na do jogo. O painel só fala com o
+  plugin por `PanelHost` (`snapshot()` e `submit()`, implementados pelo `AppBridge` com mutex curto); comandos do
+  painel entram na fila da ponte (seq 0) e passam pela mesma `interpretCommand` do `command.txt`. O `Overlay` é
+  alocado no heap e nunca destruído; `shutdown()` desfaz hooks e espera quem estiver dentro deles antes de a DLL e a ponte saírem.
 - Mudar o ganho (`boost_db`) recalcula os buffers: só com as vozes paradas (`BrakeSounds::applyConfig` faz isso).
 
 ### 2.3 Ajustes (uma tabela só)
@@ -85,15 +100,22 @@ Todo ajuste numérico vive em `floatFields()` (`src/config.cpp`): lê o `.ini`, 
 reiniciando o jogo (a tela não mostra). O teste `testJsonAndModel` falha se a tabela e a tela divergirem.
 
 ### 2.4 Tela (identidade visual)
-- A tela segue o **Trailer Control**: paleta e componentes em `app/ui.*` (cabeçalho escuro de 56 px, cartões brancos
-  arredondados, chips de status, botões primário/perigo/secundário, Segoe UI, GDI+, DPI por monitor, barra de título
-  escura). Mudou a identidade lá, muda aqui (e vice-versa).
-- Mesmos gestos: atalho abre/volta ao jogo, **Esc** volta, janela única, "Sempre no topo", modo `--demo`,
-  janela de Configurações só para o atalho.
+- A tela segue o **Trailer Control**: paleta e componentes (cabeçalho escuro de 56 px, cartões brancos arredondados,
+  chips de status, botões primário/perigo/secundário, Segoe UI). O painel dentro do jogo (`src/overlay/overlay_ui.cpp`,
+  ImGui) e o app externo (`app/ui.*`, GDI+) desenham o mesmo layout: mudou a identidade, muda nos dois e no Trailer Control.
+- Mesmos gestos: atalho abre/volta ao jogo, **Esc** volta, painel único; só o app externo tem "Sempre no topo", modo
+  `--demo` e a janela de Configurações do atalho (no painel o atalho é `[ui] hotkey` no `.ini`).
+- `[ui] mode = game | external` escolhe o painel dentro do jogo (padrão) ou o app externo. Textos (PT/EN) e rótulos dos
+  ajustes vêm de `app/texts.cpp` para os dois; idioma e aba ficam em `app.ini` (`app/prefs.*`), compartilhados.
+- O painel monta os controles a partir de `floatFields()` + `fieldMetas()`: ajuste novo aparece nele sem código extra.
 - O atalho padrão é **Ctrl + =**; o Trailer Control usa **Ctrl + -**. Não colidir.
 
 ### 2.5 Testes
 - `aa_tests` (lógica pura) e `plugin_selftest` (jogo falso carregando a DLL real) rodam em `scripts/build.ps1`.
+- `fake_game --overlay <foto.bmp> [--mouse]` (manual, precisa de tela e GPU/WARP): janela DX11 de verdade, abre o painel
+  (`AIRBRAKE_AUDIO_OVERLAY_TEST=1`, só teste), ajusta por teclado/mouse e confere o `status.json`. As teclas vão por
+  mensagem direta à janela do teste (nunca `SendInput` fora dela); `--mouse` move o cursor real por instantes.
+  Rodar quando mexer em `src/overlay/`. O ETS2 de verdade continua sem teste registrado.
 - O jogo falso aponta a pasta de IPC para uma pasta temporária (`AIRBRAKE_AUDIO_IPC_DIR`): nunca suja Documentos.
 - Toda mudança de comportamento no som precisa de teste em `tests/tests.cpp` e de linha no `docs/TESTE-NO-JOGO.md`.
 - Não afirmar que algo funciona **no jogo** sem teste real registrado; dizer o que foi só compilado/testado sem o jogo.
@@ -113,12 +135,14 @@ src/
   audio_engine.*        XAudio2 (implementa ISoundOutput)
   wav.*                 parser WAV + ganho com limitador suave
   config.*              .ini, tabela de ajustes, sanitização
-  app_bridge.*          thread: command.txt -> ajustes, status.json, atalho
+  app_bridge.*          thread: command.txt + comandos do painel -> ajustes, status.json, atalho (implementa PanelHost)
+  overlay/              painel dentro do jogo: overlay.* (hook do Present DX11, janela), overlay_ui.* (ImGui),
+                        panel_host.h (interface painel <-> plugin)
   settings_commands.*   comandos do app -> efeito (puro)
   command_inbox.* status_writer.* hotkeys.* app_launcher.* log.*
   shared/               ipc.h, ini_edit, hotkey_combo (usados também pelo app)
 app/                    main (janela), ui (paleta/componentes), model (fontes plugin/demo), texts (PT/EN),
-                        settings (prefs + janela do atalho), json
+                        settings (janela do atalho), prefs (idioma/aba, também usada pelo plugin), json
 tests/                  tests.cpp, fake_game.cpp
 scripts/                build.ps1, promote-to-main.ps1, publish-release.ps1, make_icon.js
 docs/                   roteiros de teste no jogo (pt-BR e en)
@@ -130,7 +154,8 @@ Protocolo plugin ↔ app: `src/shared/ipc.h` (`status.json`, `command.txt`, past
 
 ## 4. Ambiente
 
-- Build: `powershell -ExecutionPolicy Bypass -File scripts\build.ps1` (VS 2022 Build Tools; sem SDK a baixar).
+- Build: `powershell -ExecutionPolicy Bypass -File scripts\build.ps1` (VS 2022 Build Tools; sem SDK da SCS a baixar;
+  a primeira configuração baixa o Dear ImGui por git, então precisa de internet).
 - Deploy manual: copiar o conteúdo de `build\Release` (`airbrake_audio.dll`, `.ini`, pasta `airbrake_audio\`,
   `AirbrakeAudio.exe`) para `<ETS2>\bin\win_x64\plugins\`. Jogo com `-nointro -developer` para log mais verboso.
 - Sem o jogo: `build\Release\AirbrakeAudio.exe --demo`.
