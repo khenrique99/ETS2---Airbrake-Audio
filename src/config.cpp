@@ -105,6 +105,10 @@ Config configFromIni(const std::string &iniText) {
     if (app.empty()) app = ini::get(iniText, "ui", "web_ui"); // nome da 1.x
     c.appEnabled = app.empty() || !isOff(app);
 
+    // Aceita tambem os nomes em portugues do Trailer Control (jogo / externo).
+    const std::string mode = lower(ini::get(iniText, "ui", "mode"));
+    c.inGamePanel = !(mode == "external" || mode == "externo");
+
     hotkey::Combo combo;
     const std::string key = ini::get(iniText, "ui", "hotkey");
     if (hotkey::parse(key, combo)) c.hotkey = key;

@@ -35,6 +35,27 @@ add_library(aa_core STATIC
 )
 aa_target_defaults(aa_core)
 
+# ---------------------------------------------------------------- Dear ImGui (painel dentro do jogo)
+# Dear ImGui (MIT), baixado no configure; nao e versionado. So o necessario para DX11 + Win32.
+# Sem /WX: e codigo de terceiros.
+include(FetchContent)
+FetchContent_Declare(imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.9
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(imgui)
+add_library(imgui_aa STATIC
+    "${imgui_SOURCE_DIR}/imgui.cpp"
+    "${imgui_SOURCE_DIR}/imgui_draw.cpp"
+    "${imgui_SOURCE_DIR}/imgui_tables.cpp"
+    "${imgui_SOURCE_DIR}/imgui_widgets.cpp"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp"
+    "${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp")
+target_include_directories(imgui_aa SYSTEM PUBLIC "${imgui_SOURCE_DIR}" "${imgui_SOURCE_DIR}/backends")
+target_compile_definitions(imgui_aa PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _CRT_SECURE_NO_WARNINGS
+    IMGUI_DISABLE_DEMO_WINDOWS IMGUI_DISABLE_DEBUG_TOOLS)
+target_link_libraries(imgui_aa PUBLIC d3d11 dxgi dwmapi)
+
 # ---------------------------------------------------------------- plugin (DLL do jogo)
 # Usa src/scs_sdk_min.h: nao precisa baixar o SCS SDK.
 add_library(airbrake_audio SHARED
@@ -44,10 +65,14 @@ add_library(airbrake_audio SHARED
     src/app_bridge.cpp
     src/app_launcher.cpp
     src/hotkeys.cpp
+    src/overlay/overlay.cpp
+    src/overlay/overlay_ui.cpp
+    app/prefs.cpp
+    app/texts.cpp
     src/exports.def
 )
 aa_target_defaults(airbrake_audio)
-target_link_libraries(airbrake_audio PRIVATE aa_core xaudio2 ole32 shell32 user32)
+target_link_libraries(airbrake_audio PRIVATE aa_core imgui_aa xaudio2 ole32 shell32 user32)
 set_target_properties(airbrake_audio PROPERTIES PREFIX "")
 
 # .ini e sons ao lado da DLL (mesmo layout da pasta plugins do jogo)
@@ -68,6 +93,7 @@ add_executable(airbrake_audio_app WIN32
     app/model.cpp
     app/texts.cpp
     app/settings.cpp
+    app/prefs.cpp
     app/json.cpp
     app/app.rc
 )
@@ -89,6 +115,6 @@ add_test(NAME aa_tests COMMAND aa_tests)
 # "Jogo falso": carrega a DLL real pelo SDK, simula o pedal e conversa como o app.
 add_executable(fake_game tests/fake_game.cpp app/json.cpp)
 aa_target_defaults(fake_game)
-target_link_libraries(fake_game PRIVATE shell32 ole32)
+target_link_libraries(fake_game PRIVATE shell32 ole32 user32 gdi32 d3d11 dxgi)
 add_dependencies(fake_game airbrake_audio)
 add_test(NAME plugin_selftest COMMAND fake_game "$<TARGET_FILE:airbrake_audio>" --selftest)

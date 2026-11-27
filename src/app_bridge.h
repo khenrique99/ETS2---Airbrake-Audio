@@ -1,18 +1,22 @@
 #pragma once
-// Ponte entre o jogo e o app AirbrakeAudio.exe, numa thread propria:
-//   - le command.txt e aplica os comandos numa copia dos ajustes;
+// Ponte entre o jogo e a tela (painel dentro do jogo ou AirbrakeAudio.exe), numa thread propria:
+//   - le command.txt (app externo) e os comandos do painel e aplica numa copia dos ajustes;
 //   - grava status.json (batimento de 1 s; 10x por segundo com o app aberto);
-//   - abre o app pelo atalho.
+//   - chama o atalho (abre o painel / o app).
 // A thread do jogo nunca espera por ela: publica Metrics (atomicos) e pega os ajustes novos
 // com takePending().
 #include "brake_sounds.h"
+#include "command_inbox.h"
 #include "config.h"
 #include "hotkeys.h"
+#include "overlay/panel_host.h"
 
 #include <atomic>
+#include <functional>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <vector>
 
 namespace aa {
 
@@ -25,23 +29,29 @@ struct Metrics {
     std::atomic<bool> paused{true};
 };
 
-class AppBridge {
+class AppBridge final : public PanelHost {
 public:
     AppBridge(const Config &config, std::wstring iniPath, const Metrics &metrics, bool soundsLoaded,
               std::string soundError);
     AppBridge(const AppBridge &) = delete;
     AppBridge &operator=(const AppBridge &) = delete;
-    ~AppBridge() { stop(); }
+    ~AppBridge() override { stop(); }
 
-    void start();
+    // onHotkey roda na thread do teclado (so deve abrir/fechar a tela).
+    void start(std::function<void()> onHotkey);
     void stop();
 
-    // Thread do jogo: true quando o app mudou os ajustes desde a ultima chamada.
+    // Thread do jogo: true quando a tela mudou os ajustes desde a ultima chamada.
     bool takePending(Config &out);
+
+    // PanelHost (qualquer thread)
+    PanelSnapshot snapshot() const override;
+    void submit(const std::string &action) override;
 
 private:
     void run();
     void handleCommands();
+    void execute(const Command &cmd);
     void publish();
     void reloadHotkey();
 
@@ -50,15 +60,16 @@ private:
     const bool soundsLoaded_;
     const std::string soundError_;
 
-    std::mutex mutex_; // protege shown_ e dirty_
-    Config shown_;     // ajustes vistos pelo app; vao para o jogo via takePending
+    mutable std::mutex mutex_; // protege tudo desta secao
+    Config shown_;             // ajustes vistos pela tela; vao para o jogo via takePending
     bool dirty_ = false;
-
-    // So a thread da ponte mexe nestes.
     bool unsaved_ = false;
-    long long lastSeq_ = 0;
     bool lastOk_ = true;
     std::string lastResult_;
+    std::vector<Command> localCommands_; // vindos do painel (seq = 0)
+
+    // So a thread da ponte mexe nestes.
+    long long lastSeq_ = 0;
     unsigned long long lastPublishMs_ = 0;
 
     HotkeyListener hotkeys_;

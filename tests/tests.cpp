@@ -143,6 +143,13 @@ void testConfig() {
     c = aa::configFromIni("[ui]\nhotkey=banana\n");
     CHECK(c.hotkey == "CTRL+PLUS");                // invalido -> padrao
 
+    // painel: dentro do jogo por padrao; "external" (ou "externo") volta para o AirbrakeAudio.exe
+    CHECK(d.inGamePanel && aa::configFromIni("").inGamePanel);
+    CHECK(aa::configFromIni("[ui]\nmode=game\n").inGamePanel);
+    CHECK(!aa::configFromIni("[ui]\nmode=external\n").inGamePanel);
+    CHECK(!aa::configFromIni("[ui]\nmode = Externo\n").inGamePanel);
+    CHECK(aa::configFromIni("[ui]\nmode=banana\n").inGamePanel); // lixo -> padrao
+
     // gravar preserva comentarios e muda so os valores
     const std::string ini = "; topo\n[brake]\n; nota\nvolume_max = 0.5   ; fim\nfile=a.wav\n";
     aa::Config edited;
