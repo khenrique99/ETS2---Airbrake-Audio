@@ -40,8 +40,9 @@ struct Config {
     float thresholdOff = 0.02f;
 
     // [ui]
-    bool appEnabled = true;           // atalho que abre o AirbrakeAudio.exe
+    bool appEnabled = true;           // atalho que abre o painel (dentro do jogo ou AirbrakeAudio.exe)
     std::string hotkey = "CTRL+PLUS"; // formato de shared/hotkey_combo.h
+    bool inGamePanel = true;          // mode = game: painel desenhado dentro do jogo; external: AirbrakeAudio.exe
 };
 
 struct FloatField {

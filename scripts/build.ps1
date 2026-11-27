@@ -35,7 +35,7 @@ if (-not $SkipTests) {
 }
 
 # Versao a partir de src\version.h
-$version = ([regex]::Match((Get-Content "$root\src\version.h" -Raw), 'AIRBRAKE_AUDIO_VERSION\s+"(\d+\.\d+\.\d+)"')).Groups[1].Value
+$version = ([regex]::Match((Get-Content "$root\src\version.h" -Raw), 'AIRBRAKE_AUDIO_VERSION\s+"(\d+\.\d+\.\d+)')).Groups[1].Value # so a parte numerica (2.2.0-beta.1 -> 2.2.0)
 if (-not $version) { throw 'Versao nao encontrada em src\version.h' }
 $base = "AirbrakeAudio-v$version-$GameTag"
 $rel = "$root\build\Release"
@@ -50,7 +50,7 @@ if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
 New-Item -ItemType Directory -Force "$stage\airbrake_audio" | Out-Null
 Copy-Item "$rel\airbrake_audio.dll", "$rel\AirbrakeAudio.exe", "$root\config\airbrake_audio.ini" $stage
 Copy-Item "$root\assets\sounds\*.wav" "$stage\airbrake_audio\"
-Copy-Item "$root\CREDITS.md", "$root\LICENSE" $stage
+Copy-Item "$root\CREDITS.md", "$root\LICENSE", "$root\THIRD-PARTY-NOTICES.txt" $stage
 Compress-Archive -Path "$stage\*" -DestinationPath (Join-Path $dist "$base-plugins.zip")
 
 Write-Host "Release em $dist :"

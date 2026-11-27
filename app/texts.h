@@ -45,6 +45,9 @@ enum class Txt {
     DemoMessage,
     HotkeySaved,
     HotkeySavedOffline,
+    // painel dentro do jogo
+    Close,
+    KeysHint,
     // janela de Configuracoes
     DlgTitle,
     DlgHeading,

@@ -34,6 +34,8 @@ constexpr const wchar_t *kAppWindowClass = L"ETS2AirbrakeAudioApp";
 constexpr UINT kMsgShowFromGame = WM_APP + 0x41;
 constexpr const wchar_t *kFolderName = L"ETS2AirbrakeAudio";
 constexpr const wchar_t *kFolderOverrideEnv = L"AIRBRAKE_AUDIO_IPC_DIR";
+// So para teste (fake_game --overlay): com "1" o painel dentro do jogo abre sozinho ao instalar.
+constexpr const wchar_t *kOverlayTestEnv = L"AIRBRAKE_AUDIO_OVERLAY_TEST";
 constexpr const wchar_t *kStatusFile = L"status.json";
 constexpr const wchar_t *kCommandFile = L"command.txt";
 

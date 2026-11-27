@@ -6,12 +6,14 @@
 //
 // Aqui ficam so as entradas do SDK e a ligacao entre os componentes:
 //   BrakeSounds (logica)  ->  AudioEngine (XAudio2)
-//   AppBridge (thread)    <->  AirbrakeAudio.exe (status.json / command.txt)
+//   AppBridge (thread)    <->  painel dentro do jogo (Overlay) ou AirbrakeAudio.exe (status.json / command.txt)
 #include "app_bridge.h"
+#include "app_launcher.h"
 #include "audio_engine.h"
 #include "brake_sounds.h"
 #include "config.h"
 #include "log.h"
+#include "overlay/overlay.h"
 #include "scs_sdk_min.h"
 #include "version.h"
 
@@ -39,6 +41,14 @@ struct Plugin {
     float pedal = 0.0f;   // 0..1
     float speedMs = 0.0f; // m/s
 };
+
+// Atalho (thread do teclado): abre/fecha o painel dentro do jogo; se ele nao estiver disponivel
+// (modo external, jogo fora do DirectX 11, TruckersMP) abre o AirbrakeAudio.exe.
+void onHotkey() {
+    Overlay &overlay = Overlay::instance();
+    if (overlay.active()) overlay.toggle();
+    else log::info("%s", showSettingsApp().c_str());
+}
 
 // Alocado no heap de proposito: um objeto estatico juntaria as threads no descarregamento da
 // DLL, o que pode travar sob o loader lock se o jogo nao chamar shutdown.
@@ -112,6 +122,7 @@ void destroyPlugin() {
     if (!g_plugin) return;
     Plugin *p = g_plugin;
     g_plugin = nullptr;
+    Overlay::instance().shutdown(); // antes da ponte: o painel usa o AppBridge
     if (p->bridge) p->bridge->stop();
     p->sounds.stopAll();
     p->audio.shutdown();
@@ -157,7 +168,8 @@ scs_result_t scs_telemetry_init(const scs_u32_t version,
     }
 
     p->bridge = std::make_unique<AppBridge>(p->config, iniPath, p->metrics, soundsLoaded, soundError);
-    p->bridge->start();
+    p->bridge->start(onHotkey);
+    Overlay::instance().configure(p->config.inGamePanel, p->bridge.get());
 
     // So silencia quando o jogo avisar que pausou (comportamento validado no jogo desde a 0.1).
     p->paused = false;
